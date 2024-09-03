@@ -1,0 +1,319 @@
+body, html {
+    font-family: Arial, sans-serif;
+}
+
+.align-center {
+    text-align: center;
+}
+
+.font-bold-extra {
+    font-weight: 700;
+}
+
+.font-size-large {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+}
+
+.margin-bottom-medium {
+    margin-bottom: 2rem;
+}
+
+.ml-2 {
+    margin-left: 0.5rem;
+}
+
+.text-gradient {
+    background: linear-gradient(90deg, rgba(107, 33, 168, 1) 0%, rgba(255, 0, 127, 1) 100%);
+    background-clip: border-box;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.text-black {
+    color: black;
+}
+
+
+.zapier-form {
+    max-width: 100%;
+}
+
+.zapier-form .form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.zapier-form .form-field {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.zapier-form .form-field input {
+    width: 100%;
+    height: 3rem;
+    padding: 1rem 0.75rem;
+    border: 1px solid #b3b3b3;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    font-size: 0.875rem;
+    border-radius: 3px;
+}
+
+.zapier-form .form-field input:focus {
+    border-color: #db2777;
+    box-shadow: 0 0 0 1px #db2777;
+    outline: none;
+}
+
+.zapier-form .form-field label {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    font-size: 0.8rem;
+    color: #718096;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.zapier-form .form-field input:focus ~ label,
+.zapier-form .form-field input:not(:placeholder-shown) ~ label {
+    top: -0.5rem;
+    left: 0.5rem;
+    font-size: 0.75rem;
+    color: #db2777;
+    background-color: #ffffff;
+    padding: 0 0.25rem;
+}
+
+.zapier-form .form-submit {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.zapier-form button[type="submit"],
+.zapier-form-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #db2777;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+}
+
+.zapier-form button[type="submit"]:hover,
+.zapier-form-button:hover {
+    background-color: #9d174d;
+}
+
+.zapier-form button[type="submit"]:active,
+.zapier-form-button:active {
+    background-color: #7f1d4e;
+    transform: scale(0.98);
+}
+
+svg {
+    fill: currentColor;
+    height: 1.1em;
+    width: 1.1em;
+}
+
+.zapier-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.zapier-modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    max-width: 50%;
+    min-width: 380px;
+    border-radius: 5px;
+}
+
+.zapier-modal-close {
+    position: absolute;
+    top: -24px;
+    right: 10px;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    font-weight: normal;
+    text-decoration: none;
+    appearance: none;
+}
+
+.zapier-modal-close:hover,
+.zapier-modal-close:focus {
+    color: #ffffff;
+    text-decoration: none;
+    background-color: transparent;
+}
+
+.zapier-color-field-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.zapier-color-field-wrapper .wp-picker-container {
+    position: relative;
+}
+
+.zapier-color-field-wrapper .wp-picker-container .wp-color-result.button {
+    margin: 0 6px 0 0;
+    height: 30px;
+    min-height: 30px;
+}
+
+.zapier-color-field-wrapper .wp-picker-container .wp-picker-input-wrap {
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 6px;
+}
+
+.zapier-color-field-wrapper .wp-picker-container input[type="text"].wp-color-picker {
+    width: 65px;
+    height: 28px;
+    font-size: 12px;
+    vertical-align: top;
+    margin: 0;
+}
+
+.zapier-color-field-wrapper .wp-picker-container .wp-picker-holder {
+    position: absolute;
+    z-index: 100;
+    top: 100%;
+    left: 0;
+    margin-top: 6px;
+}
+
+.zapier-color-field-wrapper .wp-picker-clear {
+    height: 28px;
+    line-height: 26px;
+    padding: 0 10px;
+    font-size: 12px;
+    margin: 0;
+}
+
+.zapier-color-field-wrapper .wp-color-result .wp-color-result-text {
+    line-height: 28px;
+    font-size: 12px;
+}
+
+.zapier-color-field-wrapper input[type="text"] {
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.07);
+    border-color: #ddd;
+    background-color: #fff;
+    color: #32373c;
+}
+
+.zapier-color-field-wrapper input[type="text"]:focus {
+    border-color: #5b9dd9;
+    box-shadow: 0 0 2px rgba(30,140,190,.8);
+}
+
+#gradient-preview {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+#gradient-preview .normal-text {
+    color: #000;
+}
+
+@media (min-width: 1201px) {
+    .zapier-form .form-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+@media (max-width: 1200px) {
+    .zapier-modal-content {
+        width: 75%;
+    }
+
+    .zapier-modal-content {
+        width: 90%;
+        min-width: 100%;
+    }
+
+    .form-field input {
+        font-size: 0.875rem;
+        padding: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .zapier-modal-content {
+        width: 90%;
+        padding: 15px;
+    }
+}
+.zapier-form .form-field.error input {
+    border-color: #dc3545;
+}
+
+.zapier-form .form-field.error label {
+    color: #dc3545;
+}
+
+.zapier-form .error-message {
+    color: #dc3545;
+    font-size: 0.875em;
+    margin-top: 0.25rem;
+    display: none;
+}
+
+.zapier-form .form-message {
+    margin-bottom: 1rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.25rem;
+}
+
+.zapier-form .form-message.error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+}
+
+.zapier-form .form-message.success {
+    color: #155724;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+}
+
+@keyframes gentle-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+}
+
+.zapier-form .form-field.shake {
+    animation: gentle-shake 0.2s ease-in-out;
+}
