@@ -1,5 +1,5 @@
 === Zapier Form Integration ===
-Contributors: Chris Ewers
+Contributors: Managing Maids
 Tags: zapier, form, integration, automation, maidcentral
 Requires at least: 5.0
 Tested up to: 6.2

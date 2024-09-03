@@ -3,7 +3,7 @@
 Plugin Name: Zapier Form Modal
 Description: A plugin that adds a customizable form with Zapier integration.
 Version: 1.0
-Author: Chris Ewers
+Author: Managing Maids
 */
 
 if (!defined('ABSPATH')) {
