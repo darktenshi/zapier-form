@@ -95,7 +95,23 @@ class Zapier_Form_Admin {
             'zapier-form', 
             'setting_section_id'
         );
-    
+
+        add_settings_field(
+            'maidcentral_api_link', 
+            'MaidCentral API Link', 
+            array($this, 'maidcentral_api_link_callback'), 
+            'zapier-form', 
+            'setting_section_id'
+        );
+
+        add_settings_field(
+            'submission_options', 
+            'Submit To', 
+            array($this, 'submission_options_callback'), 
+            'zapier-form', 
+            'setting_section_id'
+        );
+
         add_settings_field(
             'zapier_button_color', 
             'Button Color', 
@@ -175,6 +191,7 @@ class Zapier_Form_Admin {
             array($this, 'print_section_info'),
             'zapier-form'
         );
+        
     }
     public function sanitize($input) {
         $new_input = array();
@@ -213,6 +230,12 @@ class Zapier_Form_Admin {
     
         $new_input['zapier_open_button_show_arrow'] = isset($input['zapier_open_button_show_arrow']) ? '1' : '0';
         $new_input['zapier_submit_button_show_arrow'] = isset($input['zapier_submit_button_show_arrow']) ? '1' : '0';
+        
+        if (isset($input['maidcentral_api_link']))
+            $new_input['maidcentral_api_link'] = esc_url_raw($input['maidcentral_api_link']);
+
+        $new_input['submit_to_zapier'] = isset($input['submit_to_zapier']) ? '1' : '0';
+        $new_input['submit_to_maidcentral'] = isset($input['submit_to_maidcentral']) ? '1' : '0';
            
         return $new_input;
     }
@@ -223,7 +246,28 @@ class Zapier_Form_Admin {
             isset($this->options['zapier_key']) ? esc_attr($this->options['zapier_key']) : ''
         );
     }
+    public function maidcentral_api_link_callback() {
+        printf(
+            '<input type="text" id="maidcentral_api_link" name="zapier_form_options[maidcentral_api_link]" value="%s" style="width: 33%%;" />',
+            isset($this->options['maidcentral_api_link']) ? esc_attr($this->options['maidcentral_api_link']) : ''
+        );
+        echo '<p class="description">Enter the full URL for the MaidCentral API (e.g., https://castlekeepers.maidcentral.net/quoting/lead)</p>';
+    }
     
+    public function submission_options_callback() {
+        $submit_to_zapier = isset($this->options['submit_to_zapier']) ? $this->options['submit_to_zapier'] : '1';
+        $submit_to_maidcentral = isset($this->options['submit_to_maidcentral']) ? $this->options['submit_to_maidcentral'] : '0';
+        
+        echo '<label style="margin-right: 20px;">
+            <input type="checkbox" id="submit_to_zapier" name="zapier_form_options[submit_to_zapier]" value="1"' . checked('1', $submit_to_zapier, false) . '/>
+            Zapier
+        </label>';
+        
+        echo '<label>
+            <input type="checkbox" id="submit_to_maidcentral" name="zapier_form_options[submit_to_maidcentral]" value="1"' . checked('1', $submit_to_maidcentral, false) . '/>
+            MaidCentral
+        </label>';
+    }
     public function render_color_picker_field($id, $name, $value, $default_color) {
         ?>
         <div class="zapier-color-field-wrapper">
@@ -385,3 +429,4 @@ class Zapier_Form_Admin {
     }
 
 }
+

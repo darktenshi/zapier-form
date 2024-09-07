@@ -60,12 +60,10 @@ class Zapier_Form {
     }
 
     public function handle_form_submission($request) {
-        
         if (!wp_verify_nonce($request->get_header('X-WP-Nonce'), 'wp_rest')) {
             return new WP_Error('invalid_nonce', 'Invalid nonce', array('status' => 403));
         }
 
-        
         $ip = $_SERVER['REMOTE_ADDR'];
         $current_time = time();
         if (!isset($this->submission_count[$ip])) {
@@ -82,9 +80,7 @@ class Zapier_Form {
 
         $params = $request->get_params();
 
-        
         if (!empty($params['website'])) {
-            
             return new WP_Error('bot_detected', 'Bot submission detected', array('status' => 403));
         }
 
@@ -106,7 +102,6 @@ class Zapier_Form {
             }
         }
 
-        
         if (!empty($data['Email'])) {
             $data['Email'] = sanitize_email($data['Email']);
             if (!is_email($data['Email'])) {
@@ -134,9 +129,50 @@ class Zapier_Form {
             ));
         }
 
+        $options = get_option('zapier_form_options');
+        $submit_to_zapier = isset($options['submit_to_zapier']) ? $options['submit_to_zapier'] : '1';
+        $submit_to_maidcentral = isset($options['submit_to_maidcentral']) ? $options['submit_to_maidcentral'] : '0';
+
+        $success_messages = array();
+        $error_messages = array();
+
+        if ($submit_to_zapier === '1') {
+            $zapier_result = $this->submit_to_zapier($data);
+            if ($zapier_result === true) {
+                $success_messages[] = "Successfully submitted to Zapier.";
+            } else {
+                $error_messages[] = "Failed to submit to Zapier: " . $zapier_result;
+            }
+        }
+
+        if ($submit_to_maidcentral === '1') {
+            $maidcentral_result = $this->submit_to_maidcentral($data);
+            if ($maidcentral_result === true) {
+                $success_messages[] = "Successfully submitted to MaidCentral.";
+            } else {
+                $error_messages[] = "Failed to submit to MaidCentral: " . $maidcentral_result;
+            }
+        }
+
+        $this->log_submission($data);
+
+        $redirect_url = isset($options['zapier_redirect_url']) ? esc_url($options['zapier_redirect_url']) : '';
+
+        if (empty($error_messages)) {
+            return new WP_REST_Response(array(
+                'success' => true,
+                'message' => implode(" ", $success_messages),
+                'redirect_url' => $redirect_url
+            ), 200);
+        } else {
+            return new WP_Error('submission_partial_failure', implode(" ", array_merge($success_messages, $error_messages)), array('status' => 500));
+        }
+    }
+
+    private function submit_to_zapier($data) {
         $zapier_webhook = get_option('zapier_form_options')['zapier_key'];
         if (!$zapier_webhook) {
-            return new WP_Error('webhook_not_configured', 'Zapier webhook not configured', array('status' => 500));
+            return "Zapier webhook not configured";
         }
 
         $response = wp_remote_post($zapier_webhook, array(
@@ -145,23 +181,51 @@ class Zapier_Form {
         ));
 
         if (is_wp_error($response)) {
-            return new WP_Error('submission_failed', 'Error submitting form', array('status' => 500));
+            return $response->get_error_message();
         }
 
-        
-        $this->log_submission($data);
+        $response_code = wp_remote_retrieve_response_code($response);
+        if ($response_code !== 200) {
+            return "Unexpected response code: " . $response_code;
+        }
 
-        $options = get_option('zapier_form_options');
-        $redirect_url = isset($options['zapier_redirect_url']) ? esc_url($options['zapier_redirect_url']) : '';
+        return true;
+    }
 
-        return new WP_REST_Response(array(
-            'message' => 'Form submitted successfully',
-            'redirect_url' => $redirect_url
-        ), 200);
+    private function submit_to_maidcentral($data) {
+        $maidcentral_api_link = get_option('zapier_form_options')['maidcentral_api_link'];
+        if (!$maidcentral_api_link) {
+            return "MaidCentral API link not configured";
+        }
+
+        // Prepare the data according to MaidCentral's expected format
+        $maidcentral_data = array(
+            'FirstName' => $data['FirstName'],
+            'LastName' => $data['LastName'],
+            'Email' => $data['Email'],
+            'Phone' => $data['Phone'],
+            'PostalCode' => $data['Zip'],
+            // Add other required fields for MaidCentral here
+        );
+
+        $response = wp_remote_post($maidcentral_api_link, array(
+            'body' => json_encode($maidcentral_data),
+            'headers' => array('Content-Type' => 'application/json'),
+        ));
+
+        if (is_wp_error($response)) {
+            return $response->get_error_message();
+        }
+
+        $response_code = wp_remote_retrieve_response_code($response);
+        if ($response_code !== 200) {
+            return "Unexpected response code: " . $response_code;
+        }
+
+        return true;
     }
 
     private function log_submission($data) {
-        
         $log_data = array(
             'timestamp' => current_time('mysql'),
             'ip' => $_SERVER['REMOTE_ADDR'],
@@ -251,7 +315,6 @@ class Zapier_Form {
                         </button>
                     </div>
                 </form>
-                
             </div>
         </div>
         <?php
