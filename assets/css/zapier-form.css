@@ -112,6 +112,10 @@ body, html {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
 }
 
+/* TODO: Add styles for multi-step form layout */
+/* TODO: Update button styles to support more customization options */
+/* TODO: Add styles for new form fields and layout in the second step */
+
 .zapier-form button[type="submit"]:hover,
 .zapier-form-button:hover {
     background-color: #9d174d;
