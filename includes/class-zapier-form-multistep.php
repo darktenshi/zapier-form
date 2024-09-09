@@ -225,7 +225,10 @@ class Zapier_Form_Multistep {
             'Email' => $data['Email'],
             'Phone' => $data['Phone'],
             'PostalCode' => $data['Zip'],
-            // Add other required fields for MaidCentral here
+            'HomeAddress1' => isset($data['HomeAddress1']) ? $data['HomeAddress1'] : '',
+            'HomeCity' => isset($data['HomeCity']) ? $data['HomeCity'] : '',
+            'HomeRegion' => isset($data['HomeRegion']) ? $data['HomeRegion'] : '',
+            'HomeZip' => isset($data['HomeZip']) ? $data['HomeZip'] : $data['Zip'],
         );
 
         $response = wp_remote_post($maidcentral_api_link, array(
