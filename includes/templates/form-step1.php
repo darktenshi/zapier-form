@@ -4,22 +4,27 @@
         <div class="form-field">
             <input type="text" id="FirstName" name="FirstName" required placeholder=" ">
             <label for="FirstName">First Name</label>
+            <div class="error-message"></div>
         </div>
         <div class="form-field">
             <input type="text" id="LastName" name="LastName" required placeholder=" ">
             <label for="LastName">Last Name</label>
+            <div class="error-message"></div>
         </div>
         <div class="form-field">
             <input type="email" id="Email" name="Email" required placeholder=" ">
             <label for="Email">Email</label>
+            <div class="error-message"></div>
         </div>
         <div class="form-field">
             <input type="tel" id="Phone" name="Phone" required placeholder=" ">
             <label for="Phone">Phone</label>
+            <div class="error-message"></div>
         </div>
         <div class="form-field">
             <input type="text" id="Zip" name="Zip" required placeholder=" ">
             <label for="Zip">Zip Code</label>
+            <div class="error-message"></div>
         </div>
     </div>
     <div class="form-submit">

@@ -7,14 +7,17 @@
         <div class="form-field">
             <input type="text" id="HomeAddress1" name="HomeAddress1" required placeholder=" ">
             <label for="HomeAddress1">Street Address</label>
+            <div class="error-message"></div>
         </div>
         <div class="form-field">
             <input type="text" id="HomeCity" name="HomeCity" required placeholder=" ">
             <label for="HomeCity">City</label>
+            <div class="error-message"></div>
         </div>
         <div class="form-field">
             <input type="text" id="HomeRegion" name="HomeRegion" required placeholder=" ">
             <label for="HomeRegion">State</label>
+            <div class="error-message"></div>
         </div>
         <div class="form-field">
             <select id="ScopeGroupId" name="ScopeGroupId" required>
@@ -23,12 +26,14 @@
                 <option value="2">Deep Clean</option>
                 <!-- Add more options as needed -->
             </select>
+            <div class="error-message"></div>
         </div>
         <div class="form-field">
             <select id="ScopeOfWorkId" name="ScopeOfWorkId" required>
                 <option value="">Select Scope of Work</option>
                 <!-- Options will be populated dynamically based on ScopeGroupId -->
             </select>
+            <div class="error-message"></div>
         </div>
         <div class="form-field">
             <select id="Frequency" name="Frequency" required>
@@ -37,18 +42,22 @@
                 <option value="biweekly">Bi-weekly</option>
                 <option value="monthly">Monthly</option>
             </select>
+            <div class="error-message"></div>
         </div>
         <div class="form-field">
             <input type="number" id="HomeBedrooms" name="HomeBedrooms" required placeholder=" ">
             <label for="HomeBedrooms">Number of Bedrooms</label>
+            <div class="error-message"></div>
         </div>
         <div class="form-field">
             <input type="number" id="HomeFullBathrooms" name="HomeFullBathrooms" required placeholder=" ">
             <label for="HomeFullBathrooms">Number of Bathrooms</label>
+            <div class="error-message"></div>
         </div>
         <div class="form-field">
             <input type="number" id="HomeSquareFeet" name="HomeSquareFeet" required placeholder=" ">
             <label for="HomeSquareFeet">Square Footage</label>
+            <div class="error-message"></div>
         </div>
     </div>
     <div class="form-submit">

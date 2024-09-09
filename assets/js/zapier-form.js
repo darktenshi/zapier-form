@@ -119,6 +119,61 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function validateForm() {
+        const form = document.getElementById(`zapier-form-step${currentStep}`);
+        const fields = form.querySelectorAll('input, select');
+        let isValid = true;
+
+        fields.forEach(field => {
+            if (!validateField(field)) {
+                isValid = false;
+            }
+        });
+
+        return isValid;
+    }
+
+    function validateField(field) {
+        const isValid = field.checkValidity();
+        const errorElement = field.parentElement.querySelector('.error-message');
+
+        if (!isValid) {
+            field.parentElement.classList.add('error');
+            if (errorElement) {
+                errorElement.style.display = 'block';
+                errorElement.textContent = field.validationMessage;
+            }
+        } else {
+            field.parentElement.classList.remove('error');
+            if (errorElement) {
+                errorElement.style.display = 'none';
+            }
+        }
+
+        return isValid;
+    }
+
+    function shakeInvalidFields() {
+        const form = document.getElementById(`zapier-form-step${currentStep}`);
+        const invalidFields = form.querySelectorAll('.error');
+
+        invalidFields.forEach(field => {
+            field.classList.add('shake');
+            setTimeout(() => {
+                field.classList.remove('shake');
+            }, 500);
+        });
+    }
+
+    function focusFirstInvalidField() {
+        const form = document.getElementById(`zapier-form-step${currentStep}`);
+        const firstInvalidField = form.querySelector('.error input, .error select');
+
+        if (firstInvalidField) {
+            firstInvalidField.focus();
+        }
+    }
+
     function submitStep1() {
         const form = document.getElementById('zapier-form-step1');
         const formData = new FormData(form);
