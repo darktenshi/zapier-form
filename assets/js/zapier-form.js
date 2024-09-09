@@ -32,7 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(text => {
             console.log('Raw response:', text);
             try {
-                return JSON.parse(text);
+                // Remove any potential HTML tags before parsing JSON
+                const cleanedText = text.replace(/<[^>]*>/g, '');
+                return JSON.parse(cleanedText);
             } catch (e) {
                 console.error('Error parsing JSON:', e);
                 console.log('Invalid JSON:', text);

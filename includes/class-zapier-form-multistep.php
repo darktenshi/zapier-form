@@ -47,7 +47,12 @@ class Zapier_Form_Multistep {
         include(ZFI_PLUGIN_DIR . 'includes/templates/form-step1.php');
         $html = ob_get_clean();
         $response = array('success' => true, 'html' => $html);
-        $this->log_debug('load_step1 response: ' . json_encode($response));
+        $json_response = json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if ($json_response === false) {
+            $this->log_debug('JSON encoding failed: ' . json_last_error_msg());
+            return new WP_REST_Response(array('success' => false, 'message' => 'Internal server error'), 500);
+        }
+        $this->log_debug('load_step1 response: ' . $json_response);
         return new WP_REST_Response($response);
     }
 
