@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     openButton.addEventListener('click', () => {
         modal.style.display = 'block';
         document.body.classList.add('no-scroll');
+        resetForm();
     });
     
     closeButton.addEventListener('click', () => {
@@ -88,12 +89,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function loadStep2(transientKey) {
-        fetch(`${zapier_form_rest.ajax_url}?action=zapier_form_load_step2&transient_key=${transientKey}`)
-        .then(response => response.text())
-        .then(html => {
-            const modalContent = document.querySelector('.zapier-modal-content');
-            modalContent.innerHTML = html;
-            initializeForm();
+        fetch(`${zapier_form_rest.ajax_url}?action=zapier_form_load_step2&transient_key=${transientKey}&nonce=${zapier_form_rest.nonce}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const modalContent = document.querySelector('.zapier-modal-content');
+                modalContent.innerHTML = data.data.html;
+                initializeForm();
+            } else {
+                showMessage(data.data.message || 'An error occurred. Please try again.', 'error');
+            }
         })
         .catch(error => {
             console.error('Error:', error);
@@ -114,28 +119,18 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                showMessage(data.data.message, 'success');
+                showMessage(data.message, 'success');
                 resetForm();
                 setTimeout(() => {
-                    modal.style.display = 'none';
+                    if (data.redirect_url) {
+                        window.location.href = data.redirect_url;
+                    } else {
+                        modal.style.display = 'none';
+                    }
                 }, 2000);
             } else {
-                showMessage(data.data.message || 'An error occurred. Please try again.', 'error');
+                showMessage(data.message || 'An error occurred. Please try again.', 'error');
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage('An error occurred. Please try again.', 'error');
-        });
-    }
-
-    function loadStep2(transientKey) {
-        fetch(`${zapier_form_rest.ajax_url}?action=zapier_form_load_step2&transient_key=${transientKey}`)
-        .then(response => response.text())
-        .then(html => {
-            const modalContent = document.querySelector('.zapier-modal-content');
-            modalContent.innerHTML = html;
-            initializeForm();
         })
         .catch(error => {
             console.error('Error:', error);
@@ -149,14 +144,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const modalContent = document.querySelector('.zapier-modal-content');
         modalContent.innerHTML = ''; // Clear the modal content
         // Load the first step form
-        fetch(`${zapier_form_rest.ajax_url}?action=zapier_form_load_step1`)
-        .then(response => response.text())
-        .then(html => {
-            modalContent.innerHTML = html;
-            initializeForm();
+        fetch(`${zapier_form_rest.ajax_url}?action=zapier_form_load_step1&nonce=${zapier_form_rest.nonce}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                modalContent.innerHTML = data.data.html;
+                initializeForm();
+            } else {
+                showMessage(data.message || 'An error occurred. Please try again.', 'error');
+            }
         })
         .catch(error => {
             console.error('Error:', error);
+            showMessage('An error occurred. Please try again.', 'error');
         });
     }
 
@@ -226,6 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function shakeInvalidFields() {
+        const form = document.getElementById(`zapier-form-step${currentStep}`);
         const errorFields = form.querySelectorAll('.form-field.error');
         errorFields.forEach(field => {
             field.classList.add('shake');
@@ -238,49 +239,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function focusFirstInvalidField() {
+        const form = document.getElementById(`zapier-form-step${currentStep}`);
         const firstErrorField = form.querySelector('.form-field.error input');
         if (firstErrorField) {
             firstErrorField.focus();
         }
-    }
-
-    function submitForm() {
-        const formData = {};
-        const formElements = form.elements;
-        Array.from(formElements).forEach(element => {
-            if (element.name) {
-                formData[element.name] = element.value;
-            }
-        });
-
-        fetch(zapier_form_rest.root + 'zapier-form/v1/submit', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-WP-Nonce': zapier_form_rest.nonce
-            },
-            body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showMessage(data.message, 'success');
-                resetForm();
-                setTimeout(() => {
-                    if (data.redirect_url) {
-                        window.location.href = data.redirect_url;
-                    } else {
-                        modal.style.display = 'none';
-                    }
-                }, 2000);
-            } else {
-                showMessage(data.message || 'An error occurred. Please try again.', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage('An error occurred. Please try again.', 'error');
-        });
     }
 
     function showMessage(message, type) {
@@ -289,6 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
             messageContainer = document.createElement('div');
             messageContainer.className = 'form-message';
             messageContainer.setAttribute('role', 'alert');
+            const form = document.getElementById(`zapier-form-step${currentStep}`);
             form.parentElement.insertBefore(messageContainer, form);
         }
 
@@ -296,47 +260,20 @@ document.addEventListener('DOMContentLoaded', () => {
         messageContainer.className = `form-message ${type}`;
     }
 
-    function resetForm() {
-        form.reset();
-        const errorFields = form.querySelectorAll('.form-field');
-        errorFields.forEach(field => {
-            field.classList.remove('error');
-        });
-
-        const errorMessages = form.querySelectorAll('.error-message');
-        errorMessages.forEach(message => {
-            message.remove();
-        });
-
-        const formMessage = document.querySelector('.form-message');
-        if (formMessage) {
-            formMessage.textContent = '';
-            formMessage.className = 'form-message';
-        }
-
-        formSubmitted = false;
-    }
-
-    document.getElementById('Phone').addEventListener('input', (e) => {
-        const cleaned = e.target.value.replace(/\D/g, '');
-        const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
-        if (match) {
-            e.target.value = `(${match[1]}) ${match[2]}-${match[3]}`;
-        }
-    });
-
-    document.getElementById('Email').addEventListener('keypress', (e) => {
-        if (e.which === 32) {
-            e.preventDefault();
-        }
-    });
-
-    ['FirstName', 'LastName'].forEach(id => {
-        document.getElementById(id).addEventListener('input', (e) => {
+    document.addEventListener('input', (e) => {
+        if (e.target.id === 'Phone') {
+            const cleaned = e.target.value.replace(/\D/g, '');
+            const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+            if (match) {
+                e.target.value = `(${match[1]}) ${match[2]}-${match[3]}`;
+            }
+        } else if (e.target.id === 'Email') {
+            e.target.value = e.target.value.replace(/\s/g, '');
+        } else if (e.target.id === 'FirstName' || e.target.id === 'LastName') {
             const val = e.target.value;
             if (val.length > 0) {
                 e.target.value = val.charAt(0).toUpperCase() + val.slice(1);
             }
-        });
+        }
     });
 });

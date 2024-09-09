@@ -26,5 +26,8 @@ function run_zapier_form_integration() {
 
     $admin = new Zapier_Form_Admin();
     $admin->init();
+
+    $cron = new Zapier_Form_Cron();
+    $cron->init();
 }
 add_action('plugins_loaded', 'run_zapier_form_integration');

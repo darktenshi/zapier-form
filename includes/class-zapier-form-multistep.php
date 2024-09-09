@@ -9,8 +9,18 @@ class Zapier_Form_Multistep extends Zapier_Form {
         add_action('wp_ajax_nopriv_zapier_form_step1', array($this, 'handle_step1_submission'));
         add_action('wp_ajax_zapier_form_step2', array($this, 'handle_step2_submission'));
         add_action('wp_ajax_nopriv_zapier_form_step2', array($this, 'handle_step2_submission'));
+        add_action('wp_ajax_zapier_form_load_step1', array($this, 'load_step1'));
+        add_action('wp_ajax_nopriv_zapier_form_load_step1', array($this, 'load_step1'));
         add_action('wp_ajax_zapier_form_load_step2', array($this, 'load_step2'));
         add_action('wp_ajax_nopriv_zapier_form_load_step2', array($this, 'load_step2'));
+    }
+
+    public function load_step1() {
+        check_ajax_referer('zapier_form_nonce', 'nonce');
+        ob_start();
+        include(ZFI_PLUGIN_DIR . 'includes/templates/form-step1.php');
+        $html = ob_get_clean();
+        wp_send_json_success(array('html' => $html));
     }
 
     public function load_step2() {
@@ -19,7 +29,7 @@ class Zapier_Form_Multistep extends Zapier_Form {
         $step1_data = get_transient($transient_key);
 
         if (!$step1_data) {
-            wp_send_json_error('Step 1 data not found or expired');
+            wp_send_json_error(array('message' => 'Step 1 data not found or expired'));
             return;
         }
 
