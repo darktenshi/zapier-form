@@ -2,7 +2,7 @@
 
 class Zapier_Form_Multistep {
     private $step = 1;
-    private $transient_prefix = 'zapier_form_step1_';
+    private $lead_prefix = 'zapier_form_lead_';
 
     public function init() {
         add_action('rest_api_init', array($this, 'register_rest_routes'));
@@ -32,6 +32,12 @@ class Zapier_Form_Multistep {
             'callback' => array($this, 'handle_step2_submission'),
             'permission_callback' => '__return_true'
         ));
+
+        register_rest_route('zapier-form/v1', '/finalize-submission', array(
+            'methods' => 'POST',
+            'callback' => array($this, 'finalize_submission'),
+            'permission_callback' => '__return_true'
+        ));
     }
 
     public function load_step1() {
@@ -42,11 +48,11 @@ class Zapier_Form_Multistep {
     }
 
     public function load_step2($request) {
-        $transient_key = sanitize_text_field($request->get_param('transient_key'));
-        $step1_data = get_transient($transient_key);
+        $lead_id = sanitize_text_field($request->get_param('lead_id'));
+        $step1_data = get_option($this->lead_prefix . $lead_id);
 
         if (!$step1_data) {
-            return new WP_REST_Response(array('success' => false, 'message' => 'Step 1 data not found or expired'));
+            return new WP_REST_Response(array('success' => false, 'message' => 'Step 1 data not found'));
         }
 
         ob_start();
@@ -63,22 +69,23 @@ class Zapier_Form_Multistep {
             'LastName' => sanitize_text_field($params['LastName']),
             'Email' => sanitize_email($params['Email']),
             'Phone' => sanitize_text_field($params['Phone']),
-            'Zip' => sanitize_text_field($params['Zip'])
+            'Zip' => sanitize_text_field($params['Zip']),
+            'timestamp' => time()
         );
 
-        $transient_key = $this->transient_prefix . wp_generate_password(32, false);
-        set_transient($transient_key, $step1_data, 5 * MINUTE_IN_SECONDS);
+        $lead_id = uniqid();
+        update_option($this->lead_prefix . $lead_id, $step1_data);
 
-        return new WP_REST_Response(array('success' => true, 'transient_key' => $transient_key));
+        return new WP_REST_Response(array('success' => true, 'lead_id' => $lead_id));
     }
 
     public function handle_step2_submission($request) {
         $params = $request->get_params();
-        $transient_key = sanitize_text_field($params['transient_key']);
-        $step1_data = get_transient($transient_key);
+        $lead_id = sanitize_text_field($params['lead_id']);
+        $step1_data = get_option($this->lead_prefix . $lead_id);
 
         if (!$step1_data) {
-            return new WP_REST_Response(array('success' => false, 'message' => 'Step 1 data not found or expired'));
+            return new WP_REST_Response(array('success' => false, 'message' => 'Step 1 data not found'));
         }
 
         $step2_data = array(
@@ -97,9 +104,27 @@ class Zapier_Form_Multistep {
 
         $submission_result = $this->submit_form_data($complete_data);
 
-        delete_transient($transient_key);
+        delete_option($this->lead_prefix . $lead_id);
 
         return new WP_REST_Response($submission_result);
+    }
+
+    public function finalize_submission($request) {
+        $lead_id = sanitize_text_field($request->get_param('lead_id'));
+        $lead_data = get_option($this->lead_prefix . $lead_id);
+
+        if (!$lead_data) {
+            return new WP_REST_Response(array('success' => false, 'message' => 'Lead data not found'));
+        }
+
+        // Check if more than 5 minutes have passed since first submission
+        if (time() - $lead_data['timestamp'] > 300) {
+            $submission_result = $this->submit_form_data($lead_data);
+            delete_option($this->lead_prefix . $lead_id);
+            return new WP_REST_Response($submission_result);
+        }
+
+        return new WP_REST_Response(array('success' => true, 'message' => 'Submission not yet finalized'));
     }
 
     private function submit_form_data($data) {

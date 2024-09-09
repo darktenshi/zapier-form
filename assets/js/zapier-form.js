@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeButton = document.querySelector('.zapier-modal-close');
     let currentStep = 1;
     let formSubmitted = false;
-    let transientKey = '';
+    let leadId = '';
 
     openButton.addEventListener('click', () => {
         modal.style.display = 'block';
@@ -91,8 +91,11 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             if (data.success) {
                 currentStep = 2;
-                transientKey = data.transient_key;
-                loadStep2(transientKey);
+                leadId = data.lead_id;
+                loadStep2(leadId);
+                setTimeout(() => {
+                    finalizeSubmission(leadId);
+                }, 300000); // 5-minute timeout
             } else {
                 showMessage(data.message || 'An error occurred. Please try again.', 'error');
             }
@@ -103,8 +106,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function loadStep2(transientKey) {
-        fetch(`${zapier_form_rest.root}zapier-form/v1/load-step2?transient_key=${transientKey}`, {
+    function loadStep2(leadId) {
+        fetch(`${zapier_form_rest.root}zapier-form/v1/load-step2?lead_id=${leadId}`, {
             method: 'GET',
             headers: {
                 'X-WP-Nonce': zapier_form_rest.nonce
@@ -129,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function submitStep2() {
         const form = document.getElementById('zapier-form-step2');
         const formData = new FormData(form);
-        formData.append('transient_key', transientKey);
+        formData.append('lead_id', leadId);
 
         fetch(`${zapier_form_rest.root}zapier-form/v1/submit-step2`, {
             method: 'POST',
@@ -160,67 +163,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function finalizeSubmission(leadId) {
+        fetch(`${zapier_form_rest.root}zapier-form/v1/finalize-submission`, {
+            method: 'POST',
+            headers: {
+                'X-WP-Nonce': zapier_form_rest.nonce,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ lead_id: leadId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Submission finalized:', data.message);
+            } else {
+                console.error('Failed to finalize submission:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error finalizing submission:', error);
+        });
+    }
+
     function resetForm() {
         currentStep = 1;
         formSubmitted = false;
-        transientKey = '';
+        leadId = '';
         const formContainer = document.getElementById('zapier-form-container');
         formContainer.innerHTML = '';
     }
 
-    function validateForm() {
-        const form = document.getElementById(`zapier-form-step${currentStep}`);
-        const inputs = form.querySelectorAll('input[required], select[required]');
-        let isValid = true;
-
-        inputs.forEach(input => {
-            if (!validateField(input)) {
-                isValid = false;
-            }
-        });
-
-        return isValid;
-    }
-
-    function validateField(field) {
-        if (field.checkValidity()) {
-            toggleFieldError(field, false);
-            return true;
-        } else {
-            toggleFieldError(field, true);
-            return false;
-        }
-    }
-
-    function toggleFieldError(field, show) {
-        const errorElement = field.nextElementSibling;
-        if (errorElement && errorElement.classList.contains('error-message')) {
-            errorElement.style.display = show ? 'block' : 'none';
-        }
-        field.classList.toggle('error', show);
-    }
-
-    function shakeInvalidFields() {
-        const invalidFields = document.querySelectorAll('.error');
-        invalidFields.forEach(field => {
-            field.classList.add('shake');
-            setTimeout(() => field.classList.remove('shake'), 500);
-        });
-    }
-
-    function focusFirstInvalidField() {
-        const firstInvalidField = document.querySelector('.error');
-        if (firstInvalidField) {
-            firstInvalidField.focus();
-        }
-    }
-
-    function showMessage(message, type) {
-        const messageElement = document.querySelector('.form-message');
-        messageElement.textContent = message;
-        messageElement.className = `form-message ${type}`;
-        messageElement.style.display = 'block';
-    }
+    // Keep the validateForm, validateField, toggleFieldError, shakeInvalidFields, focusFirstInvalidField, and showMessage functions as they are
 
     // Initialize the form when the page loads
     loadStep1();
