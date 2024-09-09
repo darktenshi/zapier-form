@@ -1,8 +1,8 @@
 <form id="zapier-form-step2" class="zapier-form">
     <?php wp_nonce_field('zapier_form_nonce', 'zapier_form_nonce'); ?>
-    <input type="hidden" name="transient_key" value="<?php echo esc_attr($transient_key); ?>">
+    <input type="hidden" name="lead_id" value="<?php echo esc_attr($lead_id); ?>">
     <h3>Additional Information</h3>
-    <p>Thank you, <?php echo esc_html($step1_data['FirstName']); ?>! Please provide some additional details about your cleaning needs:</p>
+    <p>Thank you, <?php echo esc_html($step1_data['FirstName']); ?>! Please provide some additional details:</p>
     <div class="form-grid">
         <div class="form-field">
             <input type="text" id="HomeAddress1" name="HomeAddress1" required placeholder=" ">
@@ -20,43 +20,8 @@
             <div class="error-message"></div>
         </div>
         <div class="form-field">
-            <select id="ScopeGroupId" name="ScopeGroupId" required>
-                <option value="">Select Service Type</option>
-                <option value="1">Recurring Service</option>
-                <option value="2">Deep Clean</option>
-                <!-- Add more options as needed -->
-            </select>
-            <div class="error-message"></div>
-        </div>
-        <div class="form-field">
-            <select id="ScopeOfWorkId" name="ScopeOfWorkId" required>
-                <option value="">Select Scope of Work</option>
-                <!-- Options will be populated dynamically based on ScopeGroupId -->
-            </select>
-            <div class="error-message"></div>
-        </div>
-        <div class="form-field">
-            <select id="Frequency" name="Frequency" required>
-                <option value="">Select Frequency</option>
-                <option value="weekly">Weekly</option>
-                <option value="biweekly">Bi-weekly</option>
-                <option value="monthly">Monthly</option>
-            </select>
-            <div class="error-message"></div>
-        </div>
-        <div class="form-field">
-            <input type="number" id="HomeBedrooms" name="HomeBedrooms" required placeholder=" ">
-            <label for="HomeBedrooms">Number of Bedrooms</label>
-            <div class="error-message"></div>
-        </div>
-        <div class="form-field">
-            <input type="number" id="HomeFullBathrooms" name="HomeFullBathrooms" required placeholder=" ">
-            <label for="HomeFullBathrooms">Number of Bathrooms</label>
-            <div class="error-message"></div>
-        </div>
-        <div class="form-field">
-            <input type="number" id="HomeSquareFeet" name="HomeSquareFeet" required placeholder=" ">
-            <label for="HomeSquareFeet">Square Footage</label>
+            <input type="text" id="HomeZip" name="HomeZip" value="<?php echo esc_attr($step1_data['Zip']); ?>" readonly placeholder=" ">
+            <label for="HomeZip">Zip Code</label>
             <div class="error-message"></div>
         </div>
     </div>
