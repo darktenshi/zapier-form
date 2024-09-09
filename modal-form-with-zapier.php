@@ -1,10 +1,13 @@
 <?php
 /*
 Plugin Name: Zapier Form Modal
-Description: A plugin that adds a customizable form with Zapier integration.
-Version: 3.0.1
+Description: A plugin that adds a customizable multi-step form with Zapier and MaidCentral integration.
+Version: 3.1.0
 Author: Managing Maids
 */
+
+// TODO: Add constants for new features (e.g., WP_CRON_INTERVAL)
+// TODO: Include new files for multi-step form and WP-Cron functionality
 
 if (!defined('ABSPATH')) {
     exit;

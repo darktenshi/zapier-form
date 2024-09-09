@@ -9,6 +9,9 @@ class Zapier_Form_Admin {
     private $active_tab;
 
     public function init() {
+        // TODO: Add new admin options for multi-step form customization
+        // TODO: Include options for ScopeGroupId and ScopeOfWorkId
+        // TODO: Add more customization options for button and text styling
         add_action('admin_menu', array($this, 'add_plugin_page'));
         add_action('admin_init', array($this, 'page_init'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));

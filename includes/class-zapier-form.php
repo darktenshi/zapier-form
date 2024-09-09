@@ -3,6 +3,9 @@ class Zapier_Form {
     private $submission_count = array();
 
     public function init() {
+        // TODO: Add methods for handling multi-step form
+        // TODO: Implement WP-Cron for delayed submission
+        // TODO: Update form rendering to support two-step process
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
         add_shortcode('zapier_form', array($this, 'render_form_button'));
         add_action('wp_footer', array($this, 'render_modal'));

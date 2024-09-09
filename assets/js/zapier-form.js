@@ -45,14 +45,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function validateForm() {
-        let isValid = true;
-        const inputs = form.querySelectorAll('input');
-        inputs.forEach(input => {
-            if (input.name !== 'website' && !validateField(input)) {
-                isValid = false;
-            }
-        });
-        return isValid;
+        // TODO: Update validation to handle multi-step form
+        // TODO: Implement logic for submitting first step and proceeding to second step
+        // TODO: Add validation for new fields in the second step
+    }
+
+    // TODO: Add functions for handling multi-step form interactions
     }
 
     function validateField(field) {
