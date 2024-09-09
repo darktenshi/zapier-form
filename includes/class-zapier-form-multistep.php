@@ -39,7 +39,9 @@ class Zapier_Form_Multistep {
         ob_start();
         include(ZFI_PLUGIN_DIR . 'includes/templates/form-step1.php');
         $html = ob_get_clean();
-        return new WP_REST_Response(array('success' => true, 'html' => $html));
+        $response = array('success' => true, 'html' => $html);
+        error_log('load_step1 response: ' . json_encode($response));
+        return new WP_REST_Response($response);
     }
 
     public function load_step2($request) {

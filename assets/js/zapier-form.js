@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function loadStep1() {
+        console.log('Loading Step 1...');
         fetch(`${zapier_form_rest.root}zapier-form/v1/load-step1`, {
             method: 'GET',
             headers: {
@@ -21,20 +22,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         })
         .then(response => {
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.text();
         })
         .then(text => {
+            console.log('Raw response:', text);
             try {
                 return JSON.parse(text);
             } catch (e) {
                 console.error('Error parsing JSON:', e);
+                console.log('Invalid JSON:', text);
                 throw new Error('Invalid JSON response');
             }
         })
         .then(data => {
+            console.log('Parsed data:', data);
             if (data.success) {
                 const formContainer = document.getElementById('zapier-form-container');
                 formContainer.innerHTML = data.html;
