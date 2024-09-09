@@ -266,12 +266,6 @@ class Zapier_Form {
         $gradient_start = isset($options['zapier_gradient_start']) ? esc_attr($options['zapier_gradient_start']) : '#6b21a8';
         $gradient_end = isset($options['zapier_gradient_end']) ? esc_attr($options['zapier_gradient_end']) : '#ff007f';
         $gradient_style = "background: linear-gradient(90deg, {$gradient_start} 0%, {$gradient_end} 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;";
-        $submit_button_text = isset($options['zapier_submit_button_text']) ? esc_html($options['zapier_submit_button_text']) : 'Submit Estimate';
-        $show_arrow = isset($options['zapier_submit_button_show_arrow']) ? $options['zapier_submit_button_show_arrow'] : '1';
-        
-        $arrow_svg = $show_arrow === '1' ? '<svg xmlns="http://www.w3.org/2000/svg" height="1.1em" viewBox="0 -960 960 960" width="1.1em" fill="currentColor" class="ml-2">
-            <path d="M584-412H182q-29 0-48.5-19.5T114-480q0-28 19.5-48t48.5-20h402L431-701q-20-20-20.5-48.5T431-798q20-20 48.5-20t48.5 21l270 269q9 10 14.5 22.5T818-480q0 14-5.5 26.5T798-431L528-162q-20 21-48 21t-48-21q-21-20-21-48.5t21-48.5l152-153Z"></path>
-        </svg>' : '';
         ?>
         <div id="zapier-form-modal" class="zapier-modal">
             <div class="zapier-modal-content">
@@ -281,43 +275,7 @@ class Zapier_Form {
                     <span class="text-gradient" style="<?php echo $gradient_style; ?>"><?php echo $heading_text_2; ?></span>
                 </h2>
                 <div class="form-message" role="alert"></div>
-                <form id="zapier-form" class="zapier-form" novalidate>
-                    <noscript>
-                        <div class="error-message">
-                            JavaScript is required for this form to function properly. Please enable JavaScript in your browser settings and reload the page.
-                        </div>
-                    </noscript>
-                    <div class="form-grid">
-                        <div class="form-field">
-                            <input type="text" id="FirstName" name="FirstName" required placeholder=" " aria-required="true">
-                            <label for="FirstName">First Name</label>
-                        </div>
-                        <div class="form-field">
-                            <input type="text" id="LastName" name="LastName" required placeholder=" " aria-required="true">
-                            <label for="LastName">Last Name</label>
-                        </div>
-                        <div class="form-field">
-                            <input type="email" id="Email" name="Email" required placeholder=" " aria-required="true">
-                            <label for="Email">Email</label>
-                        </div>
-                        <div class="form-field">
-                            <input type="tel" id="Phone" name="Phone" required placeholder=" " aria-required="true">
-                            <label for="Phone">Phone</label>
-                        </div>
-                        <div class="form-field">
-                            <input type="text" id="Zip" name="Zip" required placeholder=" " aria-required="true">
-                            <label for="Zip">Zip code</label>
-                        </div>
-                        <div class="form-field" style="display:none;">
-                            <input type="text" id="website" name="website" autocomplete="off" tabindex="-1">
-                        </div>
-                    </div>
-                    <div class="form-submit">
-                        <button type="submit" class="zapier-form-button">
-                            <?php echo $submit_button_text . $arrow_svg; ?>
-                        </button>
-                    </div>
-                </form>
+                <div id="zapier-form-container"></div>
             </div>
         </div>
         <?php

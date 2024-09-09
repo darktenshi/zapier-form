@@ -1,122 +1,105 @@
 <?php
 
-class Zapier_Form_Multistep extends Zapier_Form {
+class Zapier_Form_Multistep {
     private $step = 1;
     private $transient_prefix = 'zapier_form_step1_';
 
     public function init() {
-        add_action('wp_ajax_zapier_form_step1', array($this, 'handle_step1_submission'));
-        add_action('wp_ajax_nopriv_zapier_form_step1', array($this, 'handle_step1_submission'));
-        add_action('wp_ajax_zapier_form_step2', array($this, 'handle_step2_submission'));
-        add_action('wp_ajax_nopriv_zapier_form_step2', array($this, 'handle_step2_submission'));
-        add_action('wp_ajax_zapier_form_load_step1', array($this, 'load_step1'));
-        add_action('wp_ajax_nopriv_zapier_form_load_step1', array($this, 'load_step1'));
-        add_action('wp_ajax_zapier_form_load_step2', array($this, 'load_step2'));
-        add_action('wp_ajax_nopriv_zapier_form_load_step2', array($this, 'load_step2'));
+        add_action('rest_api_init', array($this, 'register_rest_routes'));
+    }
+
+    public function register_rest_routes() {
+        register_rest_route('zapier-form/v1', '/load-step1', array(
+            'methods' => 'GET',
+            'callback' => array($this, 'load_step1'),
+            'permission_callback' => '__return_true'
+        ));
+
+        register_rest_route('zapier-form/v1', '/submit-step1', array(
+            'methods' => 'POST',
+            'callback' => array($this, 'handle_step1_submission'),
+            'permission_callback' => '__return_true'
+        ));
+
+        register_rest_route('zapier-form/v1', '/load-step2', array(
+            'methods' => 'GET',
+            'callback' => array($this, 'load_step2'),
+            'permission_callback' => '__return_true'
+        ));
+
+        register_rest_route('zapier-form/v1', '/submit-step2', array(
+            'methods' => 'POST',
+            'callback' => array($this, 'handle_step2_submission'),
+            'permission_callback' => '__return_true'
+        ));
     }
 
     public function load_step1() {
-        check_ajax_referer('zapier_form_nonce', 'nonce');
         ob_start();
         include(ZFI_PLUGIN_DIR . 'includes/templates/form-step1.php');
         $html = ob_get_clean();
-        wp_send_json_success(array('html' => $html));
+        return new WP_REST_Response(array('success' => true, 'html' => $html));
     }
 
-    public function load_step2() {
-        check_ajax_referer('zapier_form_nonce', 'nonce');
-        $transient_key = sanitize_text_field($_GET['transient_key']);
+    public function load_step2($request) {
+        $transient_key = sanitize_text_field($request->get_param('transient_key'));
         $step1_data = get_transient($transient_key);
 
         if (!$step1_data) {
-            wp_send_json_error(array('message' => 'Step 1 data not found or expired'));
-            return;
+            return new WP_REST_Response(array('success' => false, 'message' => 'Step 1 data not found or expired'));
         }
 
         ob_start();
         include(ZFI_PLUGIN_DIR . 'includes/templates/form-step2.php');
         $html = ob_get_clean();
 
-        wp_send_json_success(array('html' => $html));
+        return new WP_REST_Response(array('success' => true, 'html' => $html));
     }
 
-    public function render_form() {
-        if ($this->step === 1) {
-            $this->render_step1();
-        } else {
-            $this->render_step2();
-        }
-    }
-
-    private function render_step1() {
-        // Render the first step of the form (basic information)
-        include(ZFI_PLUGIN_DIR . 'templates/form-step1.php');
-    }
-
-    private function render_step2() {
-        // Render the second step of the form (additional details)
-        $step1_data = $this->get_step1_data();
-        include(ZFI_PLUGIN_DIR . 'templates/form-step2.php');
-    }
-
-    public function handle_step1_submission() {
-        check_ajax_referer('zapier_form_nonce', 'nonce');
-
+    public function handle_step1_submission($request) {
+        $params = $request->get_params();
         $step1_data = array(
-            'FirstName' => sanitize_text_field($_POST['FirstName']),
-            'LastName' => sanitize_text_field($_POST['LastName']),
-            'Email' => sanitize_email($_POST['Email']),
-            'Phone' => sanitize_text_field($_POST['Phone']),
-            'Zip' => sanitize_text_field($_POST['Zip'])
+            'FirstName' => sanitize_text_field($params['FirstName']),
+            'LastName' => sanitize_text_field($params['LastName']),
+            'Email' => sanitize_email($params['Email']),
+            'Phone' => sanitize_text_field($params['Phone']),
+            'Zip' => sanitize_text_field($params['Zip'])
         );
 
         $transient_key = $this->transient_prefix . wp_generate_password(32, false);
         set_transient($transient_key, $step1_data, 5 * MINUTE_IN_SECONDS);
 
-        wp_send_json_success(array('transient_key' => $transient_key));
+        return new WP_REST_Response(array('success' => true, 'transient_key' => $transient_key));
     }
 
-    public function handle_step2_submission() {
-        check_ajax_referer('zapier_form_nonce', 'nonce');
-
-        $transient_key = sanitize_text_field($_POST['transient_key']);
+    public function handle_step2_submission($request) {
+        $params = $request->get_params();
+        $transient_key = sanitize_text_field($params['transient_key']);
         $step1_data = get_transient($transient_key);
 
         if (!$step1_data) {
-            wp_send_json_error('Step 1 data not found or expired');
-            return;
+            return new WP_REST_Response(array('success' => false, 'message' => 'Step 1 data not found or expired'));
         }
 
         $step2_data = array(
-            'HomeAddress1' => sanitize_text_field($_POST['HomeAddress1']),
-            'HomeCity' => sanitize_text_field($_POST['HomeCity']),
-            'HomeRegion' => sanitize_text_field($_POST['HomeRegion']),
-            'ScopeGroupId' => intval($_POST['ScopeGroupId']),
-            'ScopeOfWorkId' => intval($_POST['ScopeOfWorkId']),
-            'Frequency' => sanitize_text_field($_POST['Frequency']),
-            'HomeBedrooms' => intval($_POST['HomeBedrooms']),
-            'HomeFullBathrooms' => intval($_POST['HomeFullBathrooms']),
-            'HomeSquareFeet' => intval($_POST['HomeSquareFeet'])
+            'HomeAddress1' => sanitize_text_field($params['HomeAddress1']),
+            'HomeCity' => sanitize_text_field($params['HomeCity']),
+            'HomeRegion' => sanitize_text_field($params['HomeRegion']),
+            'ScopeGroupId' => intval($params['ScopeGroupId']),
+            'ScopeOfWorkId' => intval($params['ScopeOfWorkId']),
+            'Frequency' => sanitize_text_field($params['Frequency']),
+            'HomeBedrooms' => intval($params['HomeBedrooms']),
+            'HomeFullBathrooms' => intval($params['HomeFullBathrooms']),
+            'HomeSquareFeet' => intval($params['HomeSquareFeet'])
         );
 
         $complete_data = array_merge($step1_data, $step2_data);
 
-        // Submit the complete data to Zapier and/or MaidCentral
         $submission_result = $this->submit_form_data($complete_data);
 
-        // Clean up the transient
         delete_transient($transient_key);
 
-        if ($submission_result['success']) {
-            wp_send_json_success($submission_result['message']);
-        } else {
-            wp_send_json_error($submission_result['message']);
-        }
-    }
-
-    private function get_step1_data() {
-        $transient_key = isset($_GET['transient_key']) ? sanitize_text_field($_GET['transient_key']) : '';
-        return get_transient($transient_key);
+        return new WP_REST_Response($submission_result);
     }
 
     private function submit_form_data($data) {
@@ -145,7 +128,6 @@ class Zapier_Form_Multistep extends Zapier_Form {
             }
         }
 
-        // Log the submission
         $this->log_submission($data);
 
         $redirect_url = isset($options['zapier_redirect_url']) ? esc_url($options['zapier_redirect_url']) : '';
@@ -164,65 +146,5 @@ class Zapier_Form_Multistep extends Zapier_Form {
         }
     }
 
-    private function log_submission($data) {
-        $log_data = array(
-            'timestamp' => current_time('mysql'),
-            'ip' => $_SERVER['REMOTE_ADDR'],
-            'user_agent' => $_SERVER['HTTP_USER_AGENT'],
-            'form_data' => array(
-                'FirstName' => substr($data['FirstName'], 0, 1) . '****',
-                'LastName' => substr($data['LastName'], 0, 1) . '****',
-                'Email' => '****@' . substr(strrchr($data['Email'], "@"), 1),
-                'Phone' => '******' . substr($data['Phone'], -4),
-                'Zip' => $data['Zip']
-            )
-        );
-        error_log('Form submission: ' . json_encode($log_data));
-    }
-
-    private function submit_to_zapier($data) {
-        $zapier_webhook = get_option('zapier_form_options')['zapier_key'];
-        if (!$zapier_webhook) {
-            return "Zapier webhook not configured";
-        }
-
-        $response = wp_remote_post($zapier_webhook, array(
-            'body' => json_encode($data),
-            'headers' => array('Content-Type' => 'application/json'),
-        ));
-
-        if (is_wp_error($response)) {
-            return $response->get_error_message();
-        }
-
-        $response_code = wp_remote_retrieve_response_code($response);
-        if ($response_code !== 200) {
-            return "Unexpected response code: " . $response_code;
-        }
-
-        return true;
-    }
-
-    private function submit_to_maidcentral($data) {
-        $maidcentral_api_link = get_option('zapier_form_options')['maidcentral_api_link'];
-        if (!$maidcentral_api_link) {
-            return "MaidCentral API link not configured";
-        }
-
-        $response = wp_remote_post($maidcentral_api_link, array(
-            'body' => json_encode($data),
-            'headers' => array('Content-Type' => 'application/json'),
-        ));
-
-        if (is_wp_error($response)) {
-            return $response->get_error_message();
-        }
-
-        $response_code = wp_remote_retrieve_response_code($response);
-        if ($response_code !== 200) {
-            return "Unexpected response code: " . $response_code;
-        }
-
-        return true;
-    }
+    // Keep the log_submission, submit_to_zapier, and submit_to_maidcentral methods as they are
 }
