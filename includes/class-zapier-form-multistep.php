@@ -1,12 +1,7 @@
 <?php
 
 class Zapier_Form_Multistep {
-    private $step = 1;
     private $lead_prefix = 'zapier_form_lead_';
-
-    public function init() {
-        add_action('rest_api_init', array($this, 'register_rest_routes'));
-    }
 
     public function register_rest_routes() {
         register_rest_route('zapier-form/v1', '/load-step1', array(

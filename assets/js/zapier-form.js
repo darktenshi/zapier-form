@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentStep = 1;
     let formSubmitted = false;
     let leadId = '';
+    let submissionTimer;
 
     openButton.addEventListener('click', () => {
         modal.style.display = 'block';
@@ -93,9 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentStep = 2;
                 leadId = data.lead_id;
                 loadStep2(leadId);
-                setTimeout(() => {
-                    finalizeSubmission(leadId);
-                }, 300000); // 5-minute timeout
+                startSubmissionTimer();
             } else {
                 showMessage(data.message || 'An error occurred. Please try again.', 'error');
             }
@@ -144,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                clearTimeout(submissionTimer);
                 showMessage(data.message, 'success');
                 resetForm();
                 setTimeout(() => {
@@ -163,6 +163,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function startSubmissionTimer() {
+        submissionTimer = setTimeout(() => {
+            finalizeSubmission(leadId);
+        }, 300000); // 5-minute timeout
+    }
+
     function finalizeSubmission(leadId) {
         fetch(`${zapier_form_rest.root}zapier-form/v1/finalize-submission`, {
             method: 'POST',
@@ -176,6 +182,8 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             if (data.success) {
                 console.log('Submission finalized:', data.message);
+                resetForm();
+                modal.style.display = 'none';
             } else {
                 console.error('Failed to finalize submission:', data.message);
             }
@@ -189,6 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentStep = 1;
         formSubmitted = false;
         leadId = '';
+        clearTimeout(submissionTimer);
         const formContainer = document.getElementById('zapier-form-container');
         formContainer.innerHTML = '';
     }

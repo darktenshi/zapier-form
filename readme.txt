@@ -3,7 +3,7 @@ Contributors: Managing Maids
 Tags: zapier, form, integration, automation, maidcentral
 Requires at least: 5.0
 Tested up to: 6.2
-Stable tag: 3.0.1
+Stable tag: 3.2.0
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -59,6 +59,12 @@ You can automate various tasks such as:
 
 == Changelog ==
 
+= 3.2.0 =
+* Removed the cron job implementation.
+* Updated the form submission process to use a lead ID instead of a transient key.
+* Implemented a 5-minute timeout in JavaScript to finalize the submission if the second step isn't completed.
+* Added a new REST API endpoint to finalize the submission.
+
 = 3.0.1 =
 * Fixed background lock on mobile devices.
 
@@ -70,6 +76,9 @@ You can automate various tasks such as:
 * Initial release
 
 == Upgrade Notice ==
+
+= 3.2.0 =
+This update improves the form submission process and removes the dependency on WP-Cron. Update recommended for all users.
 
 = 3.0.1 =
 This update fixes the background lock on mobile devices. Update recommended for all users.
