@@ -116,10 +116,16 @@ class Zapier_Form_Multistep extends Zapier_Form {
             }
         }
 
+        // Log the submission
+        $this->log_submission($data);
+
+        $redirect_url = isset($options['zapier_redirect_url']) ? esc_url($options['zapier_redirect_url']) : '';
+
         if (empty($error_messages)) {
             return array(
                 'success' => true,
-                'message' => implode(" ", $success_messages)
+                'message' => implode(" ", $success_messages),
+                'redirect_url' => $redirect_url
             );
         } else {
             return array(
@@ -127,6 +133,22 @@ class Zapier_Form_Multistep extends Zapier_Form {
                 'message' => implode(" ", array_merge($success_messages, $error_messages))
             );
         }
+    }
+
+    private function log_submission($data) {
+        $log_data = array(
+            'timestamp' => current_time('mysql'),
+            'ip' => $_SERVER['REMOTE_ADDR'],
+            'user_agent' => $_SERVER['HTTP_USER_AGENT'],
+            'form_data' => array(
+                'FirstName' => substr($data['FirstName'], 0, 1) . '****',
+                'LastName' => substr($data['LastName'], 0, 1) . '****',
+                'Email' => '****@' . substr(strrchr($data['Email'], "@"), 1),
+                'Phone' => '******' . substr($data['Phone'], -4),
+                'Zip' => $data['Zip']
+            )
+        );
+        error_log('Form submission: ' . json_encode($log_data));
     }
 
     private function submit_to_zapier($data) {
