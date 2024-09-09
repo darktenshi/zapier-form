@@ -29,3 +29,10 @@ function run_zapier_form_integration() {
     add_action('rest_api_init', array($multistep, 'register_rest_routes'));
 }
 add_action('plugins_loaded', 'run_zapier_form_integration');
+
+// Register REST routes for Zapier_Form_Multistep
+function register_zapier_form_rest_routes() {
+    $multistep = new Zapier_Form_Multistep();
+    $multistep->register_rest_routes();
+}
+add_action('rest_api_init', 'register_zapier_form_rest_routes');
