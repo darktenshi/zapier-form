@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(response => {
             console.log('Response status:', response.status);
-            console.log('Response headers:', response.headers);
+            console.log('Response headers:', JSON.stringify(Array.from(response.headers.entries())));
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -36,23 +36,40 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (e) {
                 console.error('Error parsing JSON:', e);
                 console.log('Invalid JSON:', text);
+                logToServer('JSON Parse Error', { error: e.toString(), text: text });
                 throw new Error('Invalid JSON response');
             }
         })
         .then(data => {
-            console.log('Parsed data:', data);
+            console.log('Parsed data:', JSON.stringify(data, null, 2));
             if (data.success) {
                 const formContainer = document.getElementById('zapier-form-container');
                 formContainer.innerHTML = data.html;
                 initializeForm();
             } else {
                 showMessage(data.message || 'An error occurred. Please try again.', 'error');
+                logToServer('Form Load Error', data);
             }
         })
         .catch(error => {
             console.error('Error:', error);
             showMessage('An error occurred while loading the form. Please try again later.', 'error');
+            logToServer('Form Load Exception', { error: error.toString() });
         });
+    }
+
+    function logToServer(type, data) {
+        fetch(`${zapier_form_rest.root}zapier-form/v1/log`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-WP-Nonce': zapier_form_rest.nonce
+            },
+            body: JSON.stringify({ type, data })
+        })
+        .then(response => response.json())
+        .then(result => console.log('Log sent to server:', result))
+        .catch(error => console.error('Error logging to server:', error));
     }
 
     function showMessage(message, type) {

@@ -33,15 +33,37 @@ class Zapier_Form_Multistep {
             'callback' => array($this, 'finalize_submission'),
             'permission_callback' => '__return_true'
         ));
+
+        register_rest_route('zapier-form/v1', '/log', array(
+            'methods' => 'POST',
+            'callback' => array($this, 'handle_client_log'),
+            'permission_callback' => '__return_true'
+        ));
     }
 
     public function load_step1() {
+        $this->log_debug('load_step1 called');
         ob_start();
         include(ZFI_PLUGIN_DIR . 'includes/templates/form-step1.php');
         $html = ob_get_clean();
         $response = array('success' => true, 'html' => $html);
-        error_log('load_step1 response: ' . json_encode($response));
+        $this->log_debug('load_step1 response: ' . json_encode($response));
         return new WP_REST_Response($response);
+    }
+
+    public function handle_client_log($request) {
+        $params = $request->get_params();
+        $type = isset($params['type']) ? sanitize_text_field($params['type']) : 'Unknown';
+        $data = isset($params['data']) ? $params['data'] : array();
+        
+        $log_message = "Client Log - Type: $type, Data: " . json_encode($data);
+        $this->log_debug($log_message);
+        
+        return new WP_REST_Response(array('success' => true));
+    }
+
+    private function log_debug($message) {
+        error_log('[Zapier Form Debug] ' . $message);
     }
 
     public function load_step2($request) {
