@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
 }
 
 define('ZFI_VERSION', '3.1.0');
-define('ZFI_CRON_INTERVAL', 5 * MINUTE_IN_SECONDS); // 5 minutes
+define('ZFI_CRON_INTERVAL', 60); // 60 seconds for testing
 define('ZFI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZFI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
