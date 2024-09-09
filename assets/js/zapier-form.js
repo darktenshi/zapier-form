@@ -2,56 +2,152 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('zapier-form-modal');
     const openButton = document.getElementById('open-zapier-form');
     const closeButton = document.querySelector('.zapier-modal-close');
-    const form = document.getElementById('zapier-form');
-    const submitButton = form.querySelector('button[type="submit"]');
+    let currentStep = 1;
     let formSubmitted = false;
 
     openButton.addEventListener('click', () => {
         modal.style.display = 'block';
-        document.body.classList.add('no-scroll'); // Prevents scrolling
+        document.body.classList.add('no-scroll');
     });
     
     closeButton.addEventListener('click', () => {
         modal.style.display = 'none';
-        document.body.classList.remove('no-scroll'); // Restores scrolling
+        document.body.classList.remove('no-scroll');
         resetForm();
     });
     
     window.addEventListener('click', (event) => {
         if (event.target === modal) {
             modal.style.display = 'none';
-            document.body.classList.remove('no-scroll'); // Restores scrolling
+            document.body.classList.remove('no-scroll');
             resetForm();
         }
     });
-    
 
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        formSubmitted = true;
+    function initializeForm() {
+        const form = document.getElementById(`zapier-form-step${currentStep}`);
+        if (!form) return;
 
-        if (validateForm()) {
-            submitForm();
-        } else {
-            shakeInvalidFields();
-            focusFirstInvalidField();
-        }
-    });
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            formSubmitted = true;
 
-    form.addEventListener('input', (event) => {
-        if (formSubmitted) {
-            validateField(event.target);
-        }
-    });
+            if (validateForm()) {
+                if (currentStep === 1) {
+                    submitStep1();
+                } else {
+                    submitStep2();
+                }
+            } else {
+                shakeInvalidFields();
+                focusFirstInvalidField();
+            }
+        });
+
+        form.addEventListener('input', (event) => {
+            if (formSubmitted) {
+                validateField(event.target);
+            }
+        });
+    }
 
     function validateForm() {
-        // TODO: Update validation to handle multi-step form
-        // TODO: Implement logic for submitting first step and proceeding to second step
-        // TODO: Add validation for new fields in the second step
+        const form = document.getElementById(`zapier-form-step${currentStep}`);
+        let isValid = true;
+        Array.from(form.elements).forEach(field => {
+            if (!validateField(field)) {
+                isValid = false;
+            }
+        });
+        return isValid;
     }
 
-    // TODO: Add functions for handling multi-step form interactions
+    function submitStep1() {
+        const form = document.getElementById('zapier-form-step1');
+        const formData = new FormData(form);
+        formData.append('action', 'zapier_form_step1');
+        formData.append('nonce', zapier_form_rest.nonce);
+
+        fetch(zapier_form_rest.ajax_url, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                currentStep = 2;
+                loadStep2(data.data.transient_key);
+            } else {
+                showMessage(data.data.message || 'An error occurred. Please try again.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('An error occurred. Please try again.', 'error');
+        });
     }
+
+    function submitStep2() {
+        const form = document.getElementById('zapier-form-step2');
+        const formData = new FormData(form);
+        formData.append('action', 'zapier_form_step2');
+        formData.append('nonce', zapier_form_rest.nonce);
+
+        fetch(zapier_form_rest.ajax_url, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showMessage(data.data.message, 'success');
+                resetForm();
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 2000);
+            } else {
+                showMessage(data.data.message || 'An error occurred. Please try again.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('An error occurred. Please try again.', 'error');
+        });
+    }
+
+    function loadStep2(transientKey) {
+        fetch(`${zapier_form_rest.ajax_url}?action=zapier_form_load_step2&transient_key=${transientKey}`)
+        .then(response => response.text())
+        .then(html => {
+            const modalContent = document.querySelector('.zapier-modal-content');
+            modalContent.innerHTML = html;
+            initializeForm();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('An error occurred. Please try again.', 'error');
+        });
+    }
+
+    function resetForm() {
+        currentStep = 1;
+        formSubmitted = false;
+        const modalContent = document.querySelector('.zapier-modal-content');
+        modalContent.innerHTML = ''; // Clear the modal content
+        // Load the first step form
+        fetch(`${zapier_form_rest.ajax_url}?action=zapier_form_load_step1`)
+        .then(response => response.text())
+        .then(html => {
+            modalContent.innerHTML = html;
+            initializeForm();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    // Initialize the form when the page loads
+    initializeForm();
 
     function validateField(field) {
         const value = field.value.trim();
