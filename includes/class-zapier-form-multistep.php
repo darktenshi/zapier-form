@@ -9,6 +9,25 @@ class Zapier_Form_Multistep extends Zapier_Form {
         add_action('wp_ajax_nopriv_zapier_form_step1', array($this, 'handle_step1_submission'));
         add_action('wp_ajax_zapier_form_step2', array($this, 'handle_step2_submission'));
         add_action('wp_ajax_nopriv_zapier_form_step2', array($this, 'handle_step2_submission'));
+        add_action('wp_ajax_zapier_form_load_step2', array($this, 'load_step2'));
+        add_action('wp_ajax_nopriv_zapier_form_load_step2', array($this, 'load_step2'));
+    }
+
+    public function load_step2() {
+        check_ajax_referer('zapier_form_nonce', 'nonce');
+        $transient_key = sanitize_text_field($_GET['transient_key']);
+        $step1_data = get_transient($transient_key);
+
+        if (!$step1_data) {
+            wp_send_json_error('Step 1 data not found or expired');
+            return;
+        }
+
+        ob_start();
+        include(ZFI_PLUGIN_DIR . 'includes/templates/form-step2.php');
+        $html = ob_get_clean();
+
+        wp_send_json_success(array('html' => $html));
     }
 
     public function render_form() {

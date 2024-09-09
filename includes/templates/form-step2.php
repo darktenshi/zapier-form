@@ -1,6 +1,8 @@
 <form id="zapier-form-step2" class="zapier-form">
     <?php wp_nonce_field('zapier_form_nonce', 'zapier_form_nonce'); ?>
-    <input type="hidden" name="transient_key" value="<?php echo esc_attr($_GET['transient_key']); ?>">
+    <input type="hidden" name="transient_key" value="<?php echo esc_attr($transient_key); ?>">
+    <h3>Additional Information</h3>
+    <p>Thank you, <?php echo esc_html($step1_data['FirstName']); ?>! Please provide some additional details about your cleaning needs:</p>
     <div class="form-grid">
         <div class="form-field">
             <input type="text" id="HomeAddress1" name="HomeAddress1" required placeholder=" ">

@@ -87,6 +87,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function loadStep2(transientKey) {
+        fetch(`${zapier_form_rest.ajax_url}?action=zapier_form_load_step2&transient_key=${transientKey}`)
+        .then(response => response.text())
+        .then(html => {
+            const modalContent = document.querySelector('.zapier-modal-content');
+            modalContent.innerHTML = html;
+            initializeForm();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('An error occurred. Please try again.', 'error');
+        });
+    }
+
     function submitStep2() {
         const form = document.getElementById('zapier-form-step2');
         const formData = new FormData(form);
