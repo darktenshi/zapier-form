@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeButton = document.querySelector('.zapier-modal-close');
     let currentStep = 1;
     let formSubmitted = false;
+    let transientKey = '';
 
     openButton.addEventListener('click', () => {
         modal.style.display = 'block';
@@ -90,7 +91,8 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             if (data.success) {
                 currentStep = 2;
-                loadStep2(data.transient_key);
+                transientKey = data.transient_key;
+                loadStep2(transientKey);
             } else {
                 showMessage(data.message || 'An error occurred. Please try again.', 'error');
             }
@@ -127,6 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function submitStep2() {
         const form = document.getElementById('zapier-form-step2');
         const formData = new FormData(form);
+        formData.append('transient_key', transientKey);
 
         fetch(`${zapier_form_rest.root}zapier-form/v1/submit-step2`, {
             method: 'POST',
@@ -160,11 +163,64 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetForm() {
         currentStep = 1;
         formSubmitted = false;
+        transientKey = '';
         const formContainer = document.getElementById('zapier-form-container');
         formContainer.innerHTML = '';
     }
 
-    // Keep the rest of the functions (validateForm, validateField, toggleFieldError, shakeInvalidFields, focusFirstInvalidField, showMessage) as they are
+    function validateForm() {
+        const form = document.getElementById(`zapier-form-step${currentStep}`);
+        const inputs = form.querySelectorAll('input[required], select[required]');
+        let isValid = true;
+
+        inputs.forEach(input => {
+            if (!validateField(input)) {
+                isValid = false;
+            }
+        });
+
+        return isValid;
+    }
+
+    function validateField(field) {
+        if (field.checkValidity()) {
+            toggleFieldError(field, false);
+            return true;
+        } else {
+            toggleFieldError(field, true);
+            return false;
+        }
+    }
+
+    function toggleFieldError(field, show) {
+        const errorElement = field.nextElementSibling;
+        if (errorElement && errorElement.classList.contains('error-message')) {
+            errorElement.style.display = show ? 'block' : 'none';
+        }
+        field.classList.toggle('error', show);
+    }
+
+    function shakeInvalidFields() {
+        const invalidFields = document.querySelectorAll('.error');
+        invalidFields.forEach(field => {
+            field.classList.add('shake');
+            setTimeout(() => field.classList.remove('shake'), 500);
+        });
+    }
+
+    function focusFirstInvalidField() {
+        const firstInvalidField = document.querySelector('.error');
+        if (firstInvalidField) {
+            firstInvalidField.focus();
+        }
+    }
+
+    function showMessage(message, type) {
+        const messageElement = document.querySelector('.form-message');
+        messageElement.textContent = message;
+        messageElement.className = `form-message ${type}`;
+        messageElement.style.display = 'block';
+    }
 
     // Initialize the form when the page loads
     loadStep1();
