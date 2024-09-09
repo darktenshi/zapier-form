@@ -190,5 +190,74 @@ class Zapier_Form_Multistep {
         }
     }
 
-    // Keep the log_submission, submit_to_zapier, and submit_to_maidcentral methods as they are
+    private function submit_to_zapier($data) {
+        $zapier_webhook = get_option('zapier_form_options')['zapier_key'];
+        if (!$zapier_webhook) {
+            return "Zapier webhook not configured";
+        }
+
+        $response = wp_remote_post($zapier_webhook, array(
+            'body' => json_encode($data),
+            'headers' => array('Content-Type' => 'application/json'),
+        ));
+
+        if (is_wp_error($response)) {
+            return $response->get_error_message();
+        }
+
+        $response_code = wp_remote_retrieve_response_code($response);
+        if ($response_code !== 200) {
+            return "Unexpected response code: " . $response_code;
+        }
+
+        return true;
+    }
+
+    private function submit_to_maidcentral($data) {
+        $maidcentral_api_link = get_option('zapier_form_options')['maidcentral_api_link'];
+        if (!$maidcentral_api_link) {
+            return "MaidCentral API link not configured";
+        }
+
+        $maidcentral_data = array(
+            'FirstName' => $data['FirstName'],
+            'LastName' => $data['LastName'],
+            'Email' => $data['Email'],
+            'Phone' => $data['Phone'],
+            'PostalCode' => $data['Zip'],
+            // Add other required fields for MaidCentral here
+        );
+
+        $response = wp_remote_post($maidcentral_api_link, array(
+            'body' => json_encode($maidcentral_data),
+            'headers' => array('Content-Type' => 'application/json'),
+        ));
+
+        if (is_wp_error($response)) {
+            return $response->get_error_message();
+        }
+
+        $response_code = wp_remote_retrieve_response_code($response);
+        if ($response_code !== 200) {
+            return "Unexpected response code: " . $response_code;
+        }
+
+        return true;
+    }
+
+    private function log_submission($data) {
+        $log_data = array(
+            'timestamp' => current_time('mysql'),
+            'ip' => $_SERVER['REMOTE_ADDR'],
+            'user_agent' => $_SERVER['HTTP_USER_AGENT'],
+            'form_data' => array(
+                'FirstName' => substr($data['FirstName'], 0, 1) . '****',
+                'LastName' => substr($data['LastName'], 0, 1) . '****',
+                'Email' => '****@' . substr(strrchr($data['Email'], "@"), 1),
+                'Phone' => '******' . substr($data['Phone'], -4),
+                'Zip' => $data['Zip']
+            )
+        );
+        error_log('Form submission: ' . json_encode($log_data));
+    }
 }
