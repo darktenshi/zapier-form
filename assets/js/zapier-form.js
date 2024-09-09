@@ -8,19 +8,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     openButton.addEventListener('click', () => {
         modal.style.display = 'block';
+        document.body.classList.add('no-scroll'); // Prevents scrolling
     });
-
+    
     closeButton.addEventListener('click', () => {
         modal.style.display = 'none';
+        document.body.classList.remove('no-scroll'); // Restores scrolling
         resetForm();
     });
-
+    
     window.addEventListener('click', (event) => {
         if (event.target === modal) {
             modal.style.display = 'none';
+            document.body.classList.remove('no-scroll'); // Restores scrolling
             resetForm();
         }
     });
+    
 
     form.addEventListener('submit', (e) => {
         e.preventDefault();
