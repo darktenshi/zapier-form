@@ -71,7 +71,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 'X-WP-Nonce': zapier_form_rest.nonce
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 const formContainer = document.getElementById('zapier-form-container');
@@ -83,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => {
             console.error('Error:', error);
-            showMessage('An error occurred. Please try again.', 'error');
+            showMessage('An error occurred while loading the form. Please try again later.', 'error');
         });
     }
 
