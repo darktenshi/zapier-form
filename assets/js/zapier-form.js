@@ -12,6 +12,38 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.add('no-scroll');
         loadStep1();
     });
+
+    function loadStep1() {
+        fetch(`${zapier_form_rest.root}zapier-form/v1/load-step1`, {
+            method: 'GET',
+            headers: {
+                'X-WP-Nonce': zapier_form_rest.nonce
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const formContainer = document.getElementById('zapier-form-container');
+                formContainer.innerHTML = data.html;
+                initializeForm();
+            } else {
+                showMessage(data.message || 'An error occurred. Please try again.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('An error occurred. Please try again.', 'error');
+        });
+    }
+
+    function showMessage(message, type) {
+        const messageContainer = document.querySelector('.form-message');
+        if (messageContainer) {
+            messageContainer.textContent = message;
+            messageContainer.className = `form-message ${type}`;
+            messageContainer.style.display = 'block';
+        }
+    }
     
     closeButton.addEventListener('click', () => {
         modal.style.display = 'none';
