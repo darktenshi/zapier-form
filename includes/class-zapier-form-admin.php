@@ -9,9 +9,6 @@ class Zapier_Form_Admin {
     private $active_tab;
 
     public function init() {
-        // TODO: Add new admin options for multi-step form customization
-        // TODO: Include options for ScopeGroupId and ScopeOfWorkId
-        // TODO: Add more customization options for button and text styling
         add_action('admin_menu', array($this, 'add_plugin_page'));
         add_action('admin_init', array($this, 'page_init'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
@@ -85,161 +82,139 @@ class Zapier_Form_Admin {
         );
     
         add_settings_section(
-            'setting_section_id', 
-            'Settings', 
+            'general_settings', 
+            'General Settings', 
+            array($this, 'print_section_info'), 
+            'zapier-form'
+        );
+
+        add_settings_section(
+            'form_customization', 
+            'Form Customization', 
+            array($this, 'print_section_info'), 
+            'zapier-form'
+        );
+
+        add_settings_section(
+            'maidcentral_settings', 
+            'MaidCentral Settings', 
             array($this, 'print_section_info'), 
             'zapier-form'
         );
     
-        add_settings_field(
-            'zapier_key', 
-            'Zapier Key', 
-            array($this, 'zapier_key_callback'), 
-            'zapier-form', 
-            'setting_section_id'
-        );
+        // General Settings
+        $this->add_settings_field('zapier_key', 'Zapier Key', 'text', 'general_settings');
+        $this->add_settings_field('maidcentral_api_link', 'MaidCentral API Link', 'text', 'general_settings');
+        $this->add_settings_field('submission_options', 'Submit To', 'submission_options', 'general_settings');
+        $this->add_settings_field('zapier_redirect_url', 'Thank You Page URL (Optional)', 'text', 'general_settings');
 
-        add_settings_field(
-            'maidcentral_api_link', 
-            'MaidCentral API Link', 
-            array($this, 'maidcentral_api_link_callback'), 
-            'zapier-form', 
-            'setting_section_id'
-        );
+        // Form Customization
+        $this->add_settings_field('zapier_button_color', 'Button Color', 'color', 'form_customization');
+        $this->add_settings_field('zapier_button_hover_color', 'Button Hover Color', 'color', 'form_customization');
+        $this->add_settings_field('zapier_button_active_color', 'Button Active Color', 'color', 'form_customization');
+        $this->add_settings_field('zapier_gradient_start', 'Gradient Start Color', 'color', 'form_customization');
+        $this->add_settings_field('zapier_gradient_end', 'Gradient End Color', 'color', 'form_customization');
+        $this->add_settings_field('zapier_heading_text_1', 'Heading Text (Part 1)', 'text', 'form_customization');
+        $this->add_settings_field('zapier_heading_text_2', 'Heading Text (Part 2 - Gradient)', 'text', 'form_customization');
+        $this->add_settings_field('zapier_open_button_settings', 'Open Form Button', 'open_button_settings', 'form_customization');
+        $this->add_settings_field('zapier_submit_button_settings', 'Submit Form Button', 'submit_button_settings', 'form_customization');
 
-        add_settings_field(
-            'submission_options', 
-            'Submit To', 
-            array($this, 'submission_options_callback'), 
-            'zapier-form', 
-            'setting_section_id'
-        );
+        // MaidCentral Settings
+        $this->add_settings_field('maidcentral_scope_group_id', 'Scope Group ID', 'select', 'maidcentral_settings', array(
+            '1' => 'Recurring Service',
+            '2' => 'Deep Clean',
+            '3' => 'Move In/Out Clean'
+        ));
+        $this->add_settings_field('maidcentral_scope_of_work_id', 'Scope of Work ID', 'select', 'maidcentral_settings', array(
+            '1' => 'Standard Clean',
+            '2' => 'Deep Clean',
+            '3' => 'Move In Clean',
+            '4' => 'Move Out Clean'
+        ));
+    }
 
+    private function add_settings_field($id, $title, $type, $section, $options = array()) {
         add_settings_field(
-            'zapier_button_color', 
-            'Button Color', 
-            array($this, 'zapier_button_color_callback'), 
-            'zapier-form', 
-            'setting_section_id'
+            $id,
+            $title,
+            array($this, 'render_settings_field'),
+            'zapier-form',
+            $section,
+            array('id' => $id, 'type' => $type, 'options' => $options)
         );
-    
-        add_settings_field(
-            'zapier_button_hover_color', 
-            'Button Hover Color', 
-            array($this, 'zapier_button_hover_color_callback'), 
-            'zapier-form', 
-            'setting_section_id'
-        );
-    
-        add_settings_field(
-            'zapier_button_active_color', 
-            'Button Active Color', 
-            array($this, 'zapier_button_active_color_callback'), 
-            'zapier-form', 
-            'setting_section_id'
-        );
+    }
 
-        add_settings_field(
-            'zapier_gradient_start', 
-            'Gradient Start Color', 
-            array($this, 'zapier_gradient_start_callback'), 
-            'zapier-form', 
-            'setting_section_id'
-        );
-        add_settings_field(
-            'zapier_gradient_end', 
-            'Gradient End Color', 
-            array($this, 'zapier_gradient_end_callback'), 
-            'zapier-form', 
-            'setting_section_id'
-        );
-        add_settings_field(
-            'zapier_heading_text_1', 
-            'Heading Text (Part 1)', 
-            array($this, 'zapier_heading_text_1_callback'), 
-            'zapier-form', 
-            'setting_section_id'
-        );
-        add_settings_field(
-            'zapier_heading_text_2', 
-            'Heading Text (Part 2 - Gradient)', 
-            array($this, 'zapier_heading_text_2_callback'), 
-            'zapier-form', 
-            'setting_section_id'
-        );
-        add_settings_field(
-            'zapier_redirect_url', 
-            'Thank You Page URL (Optional)', 
-            array($this, 'zapier_redirect_url_callback'), 
-            'zapier-form', 
-            'setting_section_id'
-        );
-        add_settings_field(
-            'zapier_open_button_settings', 
-            'Open Form Button', 
-            array($this, 'zapier_open_button_settings_callback'), 
-            'zapier-form', 
-            'setting_section_id'
-        );
-        add_settings_field(
-            'zapier_submit_button_settings', 
-            'Submit Form Button', 
-            array($this, 'zapier_submit_button_settings_callback'), 
-            'zapier-form', 
-            'setting_section_id'
-        );
-        add_settings_section(
-            'setting_section_id',
-            'Settings',
-            array($this, 'print_section_info'),
-            'zapier-form'
-        );
-        
+    public function render_settings_field($args) {
+        $id = $args['id'];
+        $type = $args['type'];
+        $options = $args['options'];
+        $value = isset($this->options[$id]) ? $this->options[$id] : '';
+
+        switch ($type) {
+            case 'text':
+                printf(
+                    '<input type="text" id="%s" name="zapier_form_options[%s]" value="%s" class="regular-text" />',
+                    esc_attr($id),
+                    esc_attr($id),
+                    esc_attr($value)
+                );
+                break;
+            case 'color':
+                $this->render_color_picker_field($id, "zapier_form_options[$id]", $value, '#000000');
+                break;
+            case 'select':
+                printf('<select id="%s" name="zapier_form_options[%s]">', esc_attr($id), esc_attr($id));
+                foreach ($options as $key => $option) {
+                    printf(
+                        '<option value="%s" %s>%s</option>',
+                        esc_attr($key),
+                        selected($value, $key, false),
+                        esc_html($option)
+                    );
+                }
+                echo '</select>';
+                break;
+            case 'submission_options':
+                $this->submission_options_callback();
+                break;
+            case 'open_button_settings':
+                $this->zapier_open_button_settings_callback();
+                break;
+            case 'submit_button_settings':
+                $this->zapier_submit_button_settings_callback();
+                break;
+        }
     }
     public function sanitize($input) {
         $new_input = array();
-        if (isset($input['zapier_key']))
-            $new_input['zapier_key'] = sanitize_text_field($input['zapier_key']);
-        
-        if (isset($input['zapier_button_color']))
-            $new_input['zapier_button_color'] = sanitize_hex_color($input['zapier_button_color']);
-        
-        if (isset($input['zapier_button_hover_color']))
-            $new_input['zapier_button_hover_color'] = sanitize_hex_color($input['zapier_button_hover_color']);
-        
-        if (isset($input['zapier_button_active_color']))
-            $new_input['zapier_button_active_color'] = sanitize_hex_color($input['zapier_button_active_color']);
-    
-        if (isset($input['zapier_gradient_start']))
-            $new_input['zapier_gradient_start'] = sanitize_hex_color($input['zapier_gradient_start']);
-    
-        if (isset($input['zapier_gradient_end']))
-            $new_input['zapier_gradient_end'] = sanitize_hex_color($input['zapier_gradient_end']);
-    
-        if (isset($input['zapier_heading_text_1']))
-            $new_input['zapier_heading_text_1'] = sanitize_text_field($input['zapier_heading_text_1']);
-    
-        if (isset($input['zapier_heading_text_2']))
-            $new_input['zapier_heading_text_2'] = sanitize_text_field($input['zapier_heading_text_2']);   
-    
-        if (isset($input['zapier_redirect_url']))
-            $new_input['zapier_redirect_url'] = esc_url_raw($input['zapier_redirect_url']);    
-    
-        if (isset($input['zapier_open_button_text']))
-            $new_input['zapier_open_button_text'] = sanitize_text_field($input['zapier_open_button_text']);
-    
-        if (isset($input['zapier_submit_button_text']))
-            $new_input['zapier_submit_button_text'] = sanitize_text_field($input['zapier_submit_button_text']);
-    
+        $fields = array(
+            'zapier_key' => 'sanitize_text_field',
+            'maidcentral_api_link' => 'esc_url_raw',
+            'zapier_redirect_url' => 'esc_url_raw',
+            'zapier_button_color' => 'sanitize_hex_color',
+            'zapier_button_hover_color' => 'sanitize_hex_color',
+            'zapier_button_active_color' => 'sanitize_hex_color',
+            'zapier_gradient_start' => 'sanitize_hex_color',
+            'zapier_gradient_end' => 'sanitize_hex_color',
+            'zapier_heading_text_1' => 'sanitize_text_field',
+            'zapier_heading_text_2' => 'sanitize_text_field',
+            'zapier_open_button_text' => 'sanitize_text_field',
+            'zapier_submit_button_text' => 'sanitize_text_field',
+            'maidcentral_scope_group_id' => 'intval',
+            'maidcentral_scope_of_work_id' => 'intval'
+        );
+
+        foreach ($fields as $field => $sanitize_function) {
+            if (isset($input[$field])) {
+                $new_input[$field] = $sanitize_function($input[$field]);
+            }
+        }
+
         $new_input['zapier_open_button_show_arrow'] = isset($input['zapier_open_button_show_arrow']) ? '1' : '0';
         $new_input['zapier_submit_button_show_arrow'] = isset($input['zapier_submit_button_show_arrow']) ? '1' : '0';
-        
-        if (isset($input['maidcentral_api_link']))
-            $new_input['maidcentral_api_link'] = esc_url_raw($input['maidcentral_api_link']);
-
         $new_input['submit_to_zapier'] = isset($input['submit_to_zapier']) ? '1' : '0';
         $new_input['submit_to_maidcentral'] = isset($input['submit_to_maidcentral']) ? '1' : '0';
-           
+
         return $new_input;
     }
     
