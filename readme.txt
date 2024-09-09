@@ -59,10 +59,23 @@ You can automate various tasks such as:
 
 == Changelog ==
 
+= 3.0.1 =
+* Fixed background lock on mobile devices.
+
+= 3.0.0 =
+* Included direct Maid Central API Link.
+* Added ability to submit to either or both Zapier and Maid Central.
+
 = 1.0.0 =
 * Initial release
 
 == Upgrade Notice ==
+
+= 3.0.1 =
+This update fixes the background lock on mobile devices. Update recommended for all users.
+
+= 3.0.0 =
+Major update: Added direct Maid Central API integration and flexible submission options.
 
 = 1.0.0 =
 Initial release of the Zapier Form Integration plugin.

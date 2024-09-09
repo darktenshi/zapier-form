@@ -2,7 +2,7 @@
 /*
 Plugin Name: Zapier Form Modal
 Description: A plugin that adds a customizable form with Zapier integration.
-Version: 1.0
+Version: 3.0.1
 Author: Managing Maids
 */
 
@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ZFI_VERSION', '1.0.0');
+define('ZFI_VERSION', '3.0.1');
 define('ZFI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZFI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
