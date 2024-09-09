@@ -6,7 +6,7 @@ class Zapier_Form {
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
         add_shortcode('zapier_form', array($this, 'render_form_button'));
         add_action('wp_footer', array($this, 'render_modal'));
-        add_action('rest_api_init', array($this, 'register_rest_routes'));
+        add_action('rest_api_init', array($this, 'register_rest_route'));
     }
 
     public function enqueue_scripts() {
