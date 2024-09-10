@@ -1,3 +1,10 @@
+/**
+ * TODO: Update this script to include the following changes:
+ * 1. Add logic to handle the new frequency dropdown in the form
+ * 2. Update form submission to include ScopeGroupId, ScopeOfWorkId, and selected frequency
+ * 3. Modify form validation to include the new fields
+ * 4. Update any relevant UI interactions for the new form fields
+ */
 document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('zapier-form-modal');
     const openButton = document.getElementById('open-zapier-form');

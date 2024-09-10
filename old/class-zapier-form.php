@@ -1,4 +1,12 @@
 <?php
+/**
+ * TODO: Update this class to include the following changes:
+ * 1. Add new fields for ScopeGroupId and ScopeOfWorkId in the admin settings
+ * 2. Add a new Frequencies section in the admin settings with checkboxes for each frequency
+ * 3. Update the form submission logic to include ScopeGroupId, ScopeOfWorkId, and selected frequency
+ * 4. Modify the MaidCentral submission to include the new fields
+ * 5. Update the form rendering to include a dropdown for frequency selection
+ */
 class Zapier_Form {
     private $submission_count = array();
 
