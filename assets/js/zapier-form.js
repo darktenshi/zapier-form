@@ -150,6 +150,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 validateField(event.target);
             }
         });
+
+        // Add event listeners for field-specific formatting
+        const phoneInput = form.querySelector('input[name="Phone"]');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', formatPhoneNumber);
+        }
+
+        const emailInput = form.querySelector('input[name="Email"]');
+        if (emailInput) {
+            emailInput.addEventListener('keypress', preventSpacesInEmail);
+        }
+
+        const nameInputs = form.querySelectorAll('input[name="FirstName"], input[name="LastName"]');
+        nameInputs.forEach(input => {
+            input.addEventListener('input', capitalizeFirstLetter);
+        });
+    }
+
+    function formatPhoneNumber(e) {
+        const cleaned = e.target.value.replace(/\D/g, '');
+        const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+        if (match) {
+            e.target.value = `+1 (${match[1]}) ${match[2]}-${match[3]}`;
+        }
+    }
+
+    function preventSpacesInEmail(e) {
+        if (e.which === 32) {
+            e.preventDefault();
+        }
+    }
+
+    function capitalizeFirstLetter(e) {
+        const val = e.target.value;
+        if (val.length > 0) {
+            e.target.value = val.charAt(0).toUpperCase() + val.slice(1);
+        }
     }
 
     function validateForm() {
@@ -169,12 +206,39 @@ document.addEventListener('DOMContentLoaded', () => {
     function validateField(field) {
         const isValid = field.checkValidity();
         const errorElement = field.parentElement.querySelector('.error-message');
+        let customErrorMessage = '';
+
+        if (!isValid) {
+            switch (field.name) {
+                case 'FirstName':
+                case 'LastName':
+                    if (field.value.trim().length < 2) {
+                        customErrorMessage = 'Name must be at least 2 characters long';
+                    }
+                    break;
+                case 'Email':
+                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value)) {
+                        customErrorMessage = 'Please enter a valid email address';
+                    }
+                    break;
+                case 'Phone':
+                    if (!/^\+1 \(\d{3}\) \d{3}-\d{4}$/.test(field.value)) {
+                        customErrorMessage = 'Please enter a valid phone number';
+                    }
+                    break;
+                case 'Zip':
+                    if (!/^\d{5}(-\d{4})?$/.test(field.value)) {
+                        customErrorMessage = 'Please enter a valid ZIP code';
+                    }
+                    break;
+            }
+        }
 
         if (!isValid) {
             field.parentElement.classList.add('error');
             if (errorElement) {
                 errorElement.style.display = 'block';
-                errorElement.textContent = field.validationMessage;
+                errorElement.textContent = customErrorMessage || field.validationMessage;
             }
         } else {
             field.parentElement.classList.remove('error');
