@@ -436,7 +436,8 @@ class Zapier_Form_Admin {
             'OR' => 'Other Recurring'
         );
 
-        echo '<table class="form-table"><tr><th>Frequency</th><th>Value</th><th>Enabled</th></tr>';
+        echo '<div style="width: 33%; min-width: 300px;">';
+        echo '<table class="form-table" style="width: 100%;"><tr><th>Frequency</th><th>Value</th><th>Enabled</th></tr>';
         foreach ($frequencies as $key => $label) {
             $checked = isset($options['frequencies'][$key]) && $options['frequencies'][$key] == '1' ? 'checked' : '';
             $checked = in_array($key, array('E1', 'E2', 'E4', 'S')) ? 'checked' : $checked;
@@ -447,5 +448,6 @@ class Zapier_Form_Admin {
               </tr>";
         }
         echo '</table>';
+        echo '</div>';
     }
 }
