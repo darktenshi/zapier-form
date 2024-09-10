@@ -193,7 +193,8 @@ class Zapier_Form {
     }
 
     private function submit_to_maidcentral($data) {
-        $maidcentral_api_link = get_option('zapier_form_options')['maidcentral_api_link'];
+        $options = get_option('zapier_form_options');
+        $maidcentral_api_link = $options['maidcentral_api_link'];
         if (!$maidcentral_api_link) {
             return "MaidCentral API link not configured";
         }
@@ -205,6 +206,9 @@ class Zapier_Form {
             'Email' => $data['Email'],
             'Phone' => $data['Phone'],
             'PostalCode' => $data['Zip'],
+            'ScopeGroupId' => $options['scope_group_id'],
+            'ScopeOfWorkId' => $options['scope_of_work_id'],
+            'Frequency' => $data['Frequency'],
             // Add other required fields for MaidCentral here
         );
 
@@ -278,7 +282,7 @@ class Zapier_Form {
                     <span class="text-gradient" style="<?php echo $gradient_style; ?>"><?php echo $heading_text_2; ?></span>
                 </h2>
                 <div class="form-message" role="alert"></div>
-                <form id="zapier-form" class="zapier-form" novalidate>
+                <form id="zapier-form-step1" class="zapier-form" novalidate>
                     <noscript>
                         <div class="error-message">
                             JavaScript is required for this form to function properly. Please enable JavaScript in your browser settings and reload the page.
@@ -307,6 +311,37 @@ class Zapier_Form {
                         </div>
                         <div class="form-field" style="display:none;">
                             <input type="text" id="website" name="website" autocomplete="off" tabindex="-1">
+                        </div>
+                    </div>
+                    <div class="form-submit">
+                        <button type="submit" class="zapier-form-button">
+                            Next <?php echo $arrow_svg; ?>
+                        </button>
+                    </div>
+                </form>
+                <form id="zapier-form-step2" class="zapier-form" style="display: none;" novalidate>
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <select id="Frequency" name="Frequency" required aria-required="true">
+                                <option value="">Select Frequency</option>
+                                <?php
+                                $frequencies = array(
+                                    'E1' => 'Every Week',
+                                    'E2' => 'Every Two Weeks',
+                                    'E3' => 'Every Three Weeks',
+                                    'E4' => 'Every Four Weeks',
+                                    'S' => 'One Time Clean',
+                                    'OD' => 'On Demand',
+                                    'OR' => 'Other Recurring'
+                                );
+                                foreach ($frequencies as $value => $label) {
+                                    if (isset($options['frequencies'][$value]) && $options['frequencies'][$value] === '1') {
+                                        echo "<option value=\"$value\">$label</option>";
+                                    }
+                                }
+                                ?>
+                            </select>
+                            <label for="Frequency">Cleaning Frequency</label>
                         </div>
                     </div>
                     <div class="form-submit">

@@ -2,51 +2,68 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('zapier-form-modal');
     const openButton = document.getElementById('open-zapier-form');
     const closeButton = document.querySelector('.zapier-modal-close');
-    const form = document.getElementById('zapier-form');
-    const submitButton = form.querySelector('button[type="submit"]');
+    const form1 = document.getElementById('zapier-form-step1');
+    const form2 = document.getElementById('zapier-form-step2');
     let formSubmitted = false;
+    let formData = {};
 
     openButton.addEventListener('click', () => {
         modal.style.display = 'block';
-        document.body.classList.add('no-scroll'); // Prevents scrolling
+        document.body.classList.add('no-scroll');
     });
     
     closeButton.addEventListener('click', () => {
         modal.style.display = 'none';
-        document.body.classList.remove('no-scroll'); // Restores scrolling
+        document.body.classList.remove('no-scroll');
         resetForm();
     });
     
     window.addEventListener('click', (event) => {
         if (event.target === modal) {
             modal.style.display = 'none';
-            document.body.classList.remove('no-scroll'); // Restores scrolling
+            document.body.classList.remove('no-scroll');
             resetForm();
         }
     });
-    
 
-    form.addEventListener('submit', (e) => {
+    form1.addEventListener('submit', (e) => {
         e.preventDefault();
         formSubmitted = true;
 
-        if (validateForm()) {
+        if (validateForm(form1)) {
+            collectFormData(form1);
+            form1.style.display = 'none';
+            form2.style.display = 'block';
+        } else {
+            shakeInvalidFields(form1);
+            focusFirstInvalidField(form1);
+        }
+    });
+
+    form2.addEventListener('submit', (e) => {
+        e.preventDefault();
+        formSubmitted = true;
+
+        if (validateForm(form2)) {
+            collectFormData(form2);
             submitForm();
         } else {
-            shakeInvalidFields();
-            focusFirstInvalidField();
+            shakeInvalidFields(form2);
+            focusFirstInvalidField(form2);
         }
     });
 
-    form.addEventListener('input', (event) => {
-        if (formSubmitted) {
-            validateField(event.target);
-        }
+    [form1, form2].forEach(form => {
+        form.addEventListener('input', (event) => {
+            if (formSubmitted) {
+                validateField(event.target);
+            }
+        });
     });
 
-    function validateForm() {
+    function validateForm(form) {
         let isValid = true;
-        const inputs = form.querySelectorAll('input');
+        const inputs = form.querySelectorAll('input, select');
         inputs.forEach(input => {
             if (input.name !== 'website' && !validateField(input)) {
                 isValid = false;
@@ -93,6 +110,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         errorMessage = 'Please enter a valid ZIP code';
                     }
                     break;
+                case 'Frequency':
+                    if (value === '') {
+                        isValid = false;
+                        errorMessage = 'Please select a frequency';
+                    }
+                    break;
             }
         }
 
@@ -117,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
         field.setAttribute('aria-invalid', showError);
     }
 
-    function shakeInvalidFields() {
+    function shakeInvalidFields(form) {
         const errorFields = form.querySelectorAll('.form-field.error');
         errorFields.forEach(field => {
             field.classList.add('shake');
@@ -129,27 +152,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 820);
     }
 
-    function focusFirstInvalidField() {
-        const firstErrorField = form.querySelector('.form-field.error input');
+    function focusFirstInvalidField(form) {
+        const firstErrorField = form.querySelector('.form-field.error input, .form-field.error select');
         if (firstErrorField) {
             firstErrorField.focus();
         }
     }
 
-    function submitForm() {
-        const formData = {};
+    function collectFormData(form) {
         const formElements = form.elements;
         Array.from(formElements).forEach(element => {
             if (element.name) {
                 if (element.name === 'Phone') {
-                    // Strip all non-digit characters for phone number
                     formData[element.name] = element.value.replace(/\D/g, '');
                 } else {
                     formData[element.name] = element.value;
                 }
             }
         });
+    }
 
+    function submitForm() {
         fetch(zapier_form_rest.root + 'zapier-form/v1/submit', {
             method: 'POST',
             headers: {
@@ -186,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
             messageContainer = document.createElement('div');
             messageContainer.className = 'form-message';
             messageContainer.setAttribute('role', 'alert');
-            form.parentElement.insertBefore(messageContainer, form);
+            form1.parentElement.insertBefore(messageContainer, form1);
         }
 
         messageContainer.textContent = message;
@@ -194,15 +217,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resetForm() {
-        form.reset();
-        const errorFields = form.querySelectorAll('.form-field');
-        errorFields.forEach(field => {
-            field.classList.remove('error');
-        });
+        form1.reset();
+        form2.reset();
+        form1.style.display = 'block';
+        form2.style.display = 'none';
+        formData = {};
 
-        const errorMessages = form.querySelectorAll('.error-message');
-        errorMessages.forEach(message => {
-            message.remove();
+        [form1, form2].forEach(form => {
+            const errorFields = form.querySelectorAll('.form-field');
+            errorFields.forEach(field => {
+                field.classList.remove('error');
+            });
+
+            const errorMessages = form.querySelectorAll('.error-message');
+            errorMessages.forEach(message => {
+                message.remove();
+            });
         });
 
         const formMessage = document.querySelector('.form-message');
