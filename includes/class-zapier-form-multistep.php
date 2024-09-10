@@ -116,7 +116,8 @@ class Zapier_Form_Multistep {
             'HomeAddress1' => sanitize_text_field($params['HomeAddress1']),
             'HomeCity' => sanitize_text_field($params['HomeCity']),
             'HomeRegion' => sanitize_text_field($params['HomeRegion']),
-            'HomeZip' => $step1_data['Zip'] // Use the ZIP from step 1
+            'HomeZip' => $step1_data['Zip'], // Use the ZIP from step 1
+            'Frequency' => sanitize_text_field($params['Frequency'])
         );
 
         $complete_data = array_merge($step1_data, $step2_data);
@@ -214,7 +215,8 @@ class Zapier_Form_Multistep {
     }
 
     private function submit_to_maidcentral($data) {
-        $maidcentral_api_link = get_option('zapier_form_options')['maidcentral_api_link'];
+        $options = get_option('zapier_form_options');
+        $maidcentral_api_link = $options['maidcentral_api_link'];
         if (!$maidcentral_api_link) {
             return "MaidCentral API link not configured";
         }
@@ -229,6 +231,9 @@ class Zapier_Form_Multistep {
             'HomeCity' => isset($data['HomeCity']) ? $data['HomeCity'] : '',
             'HomeRegion' => isset($data['HomeRegion']) ? $data['HomeRegion'] : '',
             'HomeZip' => isset($data['HomeZip']) ? $data['HomeZip'] : $data['Zip'],
+            'ScopeGroupId' => $options['maidcentral_scope_group_id'],
+            'ScopeOfWorkId' => $options['maidcentral_scope_of_work_id'],
+            'Frequency' => isset($data['Frequency']) ? $data['Frequency'] : ''
         );
 
         $response = wp_remote_post($maidcentral_api_link, array(

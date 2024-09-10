@@ -24,6 +24,30 @@
             <label for="HomeZip">Zip Code</label>
             <div class="error-message"></div>
         </div>
+        <div class="form-field">
+            <select id="Frequency" name="Frequency" required>
+                <option value="">Select Frequency</option>
+                <?php
+                $options = get_option('zapier_form_options');
+                $frequencies = array(
+                    'E1' => 'Every Week',
+                    'E2' => 'Every Two Weeks',
+                    'E3' => 'Every Three Weeks',
+                    'E4' => 'Every Four Weeks',
+                    'S' => 'One Time Clean',
+                    'OD' => 'On Demand',
+                    'OR' => 'Other Recurring'
+                );
+                foreach ($frequencies as $value => $label) {
+                    if (isset($options['frequencies'][$value]) && $options['frequencies'][$value] == '1') {
+                        echo '<option value="' . esc_attr($value) . '">' . esc_html($label) . '</option>';
+                    }
+                }
+                ?>
+            </select>
+            <label for="Frequency">Cleaning Frequency</label>
+            <div class="error-message"></div>
+        </div>
     </div>
     <div class="form-submit">
         <button type="submit" class="zapier-form-button">

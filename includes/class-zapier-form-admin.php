@@ -101,6 +101,13 @@ class Zapier_Form_Admin {
             array($this, 'print_section_info'), 
             'zapier-form'
         );
+
+        add_settings_section(
+            'frequency_settings', 
+            'Frequency Settings', 
+            array($this, 'print_section_info'), 
+            'zapier-form'
+        );
     
         // General Settings
         $this->add_settings_field('zapier_key', 'Zapier Key', 'text', 'general_settings');
@@ -120,17 +127,11 @@ class Zapier_Form_Admin {
         $this->add_settings_field('zapier_submit_button_settings', 'Submit Form Button', 'submit_button_settings', 'form_customization');
 
         // MaidCentral Settings
-        $this->add_settings_field('maidcentral_scope_group_id', 'Scope Group ID', 'select', 'maidcentral_settings', array(
-            '1' => 'Recurring Service',
-            '2' => 'Deep Clean',
-            '3' => 'Move In/Out Clean'
-        ));
-        $this->add_settings_field('maidcentral_scope_of_work_id', 'Scope of Work ID', 'select', 'maidcentral_settings', array(
-            '1' => 'Standard Clean',
-            '2' => 'Deep Clean',
-            '3' => 'Move In Clean',
-            '4' => 'Move Out Clean'
-        ));
+        $this->add_settings_field('maidcentral_scope_group_id', 'Scope Group ID', 'text', 'maidcentral_settings');
+        $this->add_settings_field('maidcentral_scope_of_work_id', 'Scope of Work ID', 'text', 'maidcentral_settings');
+
+        // Frequency Settings
+        $this->add_settings_field('frequency_settings', 'Frequencies', 'frequency_settings', 'frequency_settings');
     }
 
     private function add_settings_field($id, $title, $type, $section, $options = array()) {
@@ -200,8 +201,8 @@ class Zapier_Form_Admin {
             'zapier_heading_text_2' => 'sanitize_text_field',
             'zapier_open_button_text' => 'sanitize_text_field',
             'zapier_submit_button_text' => 'sanitize_text_field',
-            'maidcentral_scope_group_id' => 'intval',
-            'maidcentral_scope_of_work_id' => 'intval'
+            'maidcentral_scope_group_id' => 'sanitize_text_field',
+            'maidcentral_scope_of_work_id' => 'sanitize_text_field'
         );
 
         foreach ($fields as $field => $sanitize_function) {
@@ -214,6 +215,18 @@ class Zapier_Form_Admin {
         $new_input['zapier_submit_button_show_arrow'] = isset($input['zapier_submit_button_show_arrow']) ? '1' : '0';
         $new_input['submit_to_zapier'] = isset($input['submit_to_zapier']) ? '1' : '0';
         $new_input['submit_to_maidcentral'] = isset($input['submit_to_maidcentral']) ? '1' : '0';
+
+        // Sanitize frequencies
+        $frequencies = array('E1', 'E2', 'E3', 'E4', 'S', 'OD', 'OR');
+        $new_input['frequencies'] = array();
+        foreach ($frequencies as $freq) {
+            $new_input['frequencies'][$freq] = isset($input['frequencies'][$freq]) ? '1' : '0';
+        }
+        // Ensure E1, E2, E4, and S are always enabled
+        $new_input['frequencies']['E1'] = '1';
+        $new_input['frequencies']['E2'] = '1';
+        $new_input['frequencies']['E4'] = '1';
+        $new_input['frequencies']['S'] = '1';
 
         return $new_input;
     }
@@ -408,3 +421,27 @@ class Zapier_Form_Admin {
 
 }
 
+    public function frequency_settings_callback() {
+        $options = get_option('zapier_form_options');
+        $frequencies = array(
+            'E1' => 'Every Week',
+            'E2' => 'Every Two Weeks',
+            'E3' => 'Every Three Weeks',
+            'E4' => 'Every Four Weeks',
+            'S' => 'One Time Clean',
+            'OD' => 'On Demand',
+            'OR' => 'Other Recurring'
+        );
+
+        echo '<table class="form-table"><tr><th>Frequency</th><th>Value</th><th>Enabled</th></tr>';
+        foreach ($frequencies as $key => $label) {
+            $checked = isset($options['frequencies'][$key]) && $options['frequencies'][$key] == '1' ? 'checked' : '';
+            $disabled = in_array($key, array('E1', 'E2', 'E4', 'S')) ? 'disabled' : '';
+            echo "<tr>
+                <td>$label</td>
+                <td>$key</td>
+                <td><input type='checkbox' name='zapier_form_options[frequencies][$key]' value='1' $checked $disabled /></td>
+              </tr>";
+        }
+        echo '</table>';
+    }

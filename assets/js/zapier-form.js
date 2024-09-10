@@ -239,6 +239,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         customErrorMessage = 'Please enter a valid ZIP code';
                     }
                     break;
+                case 'Frequency':
+                    if (field.value === '') {
+                        customErrorMessage = 'Please select a cleaning frequency';
+                    }
+                    break;
             }
         }
 
