@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const cleaned = e.target.value.replace(/\D/g, '');
         const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
         if (match) {
-            e.target.value = `+1 (${match[1]}) ${match[2]}-${match[3]}`;
+            e.target.value = `(${match[1]}) ${match[2]}-${match[3]}`;
         }
     }
 
@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     break;
                 case 'Phone':
-                    if (!/^\+1 \(\d{3}\) \d{3}-\d{4}$/.test(field.value)) {
+                    if (!/^\(\d{3}\) \d{3}-\d{4}$/.test(field.value)) {
                         customErrorMessage = 'Please enter a valid phone number';
                     }
                     break;
