@@ -15,8 +15,8 @@
             <div class="error-message"></div>
         </div>
         <div class="form-field">
-            <select id="HomeRegion" name="HomeRegion" required aria-label="State">
-                <option value="">Select State</option>
+            <select id="HomeRegion" name="HomeRegion" required>
+                <option value="" selected disabled>Select State</option>
                 <?php
                 $states = array(
                     'AL'=>'Alabama', 'AK'=>'Alaska', 'AZ'=>'Arizona', 'AR'=>'Arkansas', 'CA'=>'California',
@@ -35,7 +35,6 @@
                 }
                 ?>
             </select>
-            <label for="HomeRegion">State</label>
             <div class="error-message"></div>
         </div>
         <div class="form-field">
