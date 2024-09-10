@@ -131,7 +131,13 @@ class Zapier_Form_Admin {
         $this->add_settings_field('maidcentral_scope_of_work_id', 'Scope of Work ID', 'text', 'maidcentral_settings');
 
         // Frequency Settings
-        $this->add_settings_field('frequency_settings', 'Frequencies', 'frequency_settings', 'frequency_settings');
+        add_settings_field(
+            'frequency_settings',
+            'Frequencies',
+            array($this, 'frequency_settings_callback'),
+            'zapier-form',
+            'frequency_settings'
+        );
     }
 
     private function add_settings_field($id, $title, $type, $section, $options = array()) {
