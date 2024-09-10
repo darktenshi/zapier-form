@@ -27,6 +27,7 @@ function run_zapier_form_integration() {
 
     $multistep = new Zapier_Form_Multistep();
     add_action('rest_api_init', array($multistep, 'register_rest_routes'));
+    $multistep->register_hooks();
 }
 add_action('plugins_loaded', 'run_zapier_form_integration');
 

@@ -100,7 +100,27 @@ class Zapier_Form_Multistep {
         $lead_id = uniqid();
         update_option($this->lead_prefix . $lead_id, $step1_data);
 
+        // Schedule the submission after 5 minutes
+        wp_schedule_single_event(time() + 300, 'zapier_form_submit_incomplete_lead', array($lead_id));
+
         return new WP_REST_Response(array('success' => true, 'lead_id' => $lead_id));
+    }
+
+    public function submit_incomplete_lead($lead_id) {
+        $lead_data = get_option($this->lead_prefix . $lead_id);
+
+        if ($lead_data) {
+            // If the lead data still exists, it means the second step wasn't completed
+            $submission_result = $this->submit_form_data($lead_data);
+            delete_option($this->lead_prefix . $lead_id);
+
+            // Log the result of the incomplete submission
+            error_log('Incomplete lead submitted: ' . json_encode($submission_result));
+        }
+    }
+
+    public function register_hooks() {
+        add_action('zapier_form_submit_incomplete_lead', array($this, 'submit_incomplete_lead'));
     }
 
     public function handle_step2_submission($request) {
