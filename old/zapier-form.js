@@ -141,7 +141,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const formElements = form.elements;
         Array.from(formElements).forEach(element => {
             if (element.name) {
-                formData[element.name] = element.value;
+                if (element.name === 'Phone') {
+                    // Strip all non-digit characters for phone number
+                    formData[element.name] = element.value.replace(/\D/g, '');
+                } else {
+                    formData[element.name] = element.value;
+                }
             }
         });
 
