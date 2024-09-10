@@ -339,6 +339,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const formContainer = document.getElementById('zapier-form-container');
                 formContainer.innerHTML = data.html;
                 initializeForm();
+                
+                // Pre-fill the state dropdown based on the ZIP code
+                const zipInput = document.getElementById('HomeZip');
+                const stateSelect = document.getElementById('HomeRegion');
+                if (zipInput && stateSelect) {
+                    const zip = zipInput.value;
+                    const state = getStateFromZip(zip);
+                    if (state) {
+                        stateSelect.value = state;
+                    }
+                }
             } else {
                 showMessage(data.message || 'An error occurred. Please try again.', 'error');
             }
@@ -347,6 +358,16 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error:', error);
             showMessage('An error occurred. Please try again.', 'error');
         });
+    }
+
+    function getStateFromZip(zip) {
+        // This is a simplified version. For a more accurate result, you might want to use a ZIP code API.
+        const zipPrefixes = {
+            '0': 'CT', '1': 'NY', '2': 'NY', '3': 'NJ', '4': 'PA', '5': 'DE', '6': 'MD', '7': 'VA',
+            '8': 'NC', '9': 'SC'
+        };
+        const prefix = zip.charAt(0);
+        return zipPrefixes[prefix] || '';
     }
 
     function submitStep2() {
