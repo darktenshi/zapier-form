@@ -150,6 +150,34 @@ class Zapier_Form_Admin {
         $this->add_settings_field('default_state', 'Default State', 'state_dropdown', 'state_settings');
     }
 
+    public function render_state_dropdown($args) {
+        $id = $args['id'];
+        $name = "zapier_form_options[$id]";
+        $value = isset($this->options[$id]) ? $this->options[$id] : '';
+
+        $states = array(
+            'AL'=>'Alabama', 'AK'=>'Alaska', 'AZ'=>'Arizona', 'AR'=>'Arkansas', 'CA'=>'California',
+            'CO'=>'Colorado', 'CT'=>'Connecticut', 'DE'=>'Delaware', 'DC'=>'District of Columbia', 'FL'=>'Florida',
+            'GA'=>'Georgia', 'HI'=>'Hawaii', 'ID'=>'Idaho', 'IL'=>'Illinois', 'IN'=>'Indiana',
+            'IA'=>'Iowa', 'KS'=>'Kansas', 'KY'=>'Kentucky', 'LA'=>'Louisiana', 'ME'=>'Maine',
+            'MD'=>'Maryland', 'MA'=>'Massachusetts', 'MI'=>'Michigan', 'MN'=>'Minnesota', 'MS'=>'Mississippi',
+            'MO'=>'Missouri', 'MT'=>'Montana', 'NE'=>'Nebraska', 'NV'=>'Nevada', 'NH'=>'New Hampshire',
+            'NJ'=>'New Jersey', 'NM'=>'New Mexico', 'NY'=>'New York', 'NC'=>'North Carolina', 'ND'=>'North Dakota',
+            'OH'=>'Ohio', 'OK'=>'Oklahoma', 'OR'=>'Oregon', 'PA'=>'Pennsylvania', 'RI'=>'Rhode Island',
+            'SC'=>'South Carolina', 'SD'=>'South Dakota', 'TN'=>'Tennessee', 'TX'=>'Texas', 'UT'=>'Utah',
+            'VT'=>'Vermont', 'VA'=>'Virginia', 'WA'=>'Washington', 'WV'=>'West Virginia', 'WI'=>'Wisconsin',
+            'WY'=>'Wyoming'
+        );
+
+        echo "<select id='$id' name='$name'>";
+        echo "<option value=''>Select Default State</option>";
+        foreach ($states as $abbr => $state_name) {
+            $selected = ($value === $abbr) ? 'selected' : '';
+            echo "<option value='$abbr' $selected>$state_name</option>";
+        }
+        echo "</select>";
+    }
+
     private function add_settings_field($id, $title, $type, $section, $options = array()) {
         add_settings_field(
             $id,
@@ -199,6 +227,9 @@ class Zapier_Form_Admin {
                 break;
             case 'submit_button_settings':
                 $this->zapier_submit_button_settings_callback();
+                break;
+            case 'state_dropdown':
+                $this->render_state_dropdown($args);
                 break;
         }
     }
