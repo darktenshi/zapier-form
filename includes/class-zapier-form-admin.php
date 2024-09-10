@@ -226,13 +226,12 @@ class Zapier_Form_Admin {
         $frequencies = array('E1', 'E2', 'E3', 'E4', 'S', 'OD', 'OR');
         $new_input['frequencies'] = array();
         foreach ($frequencies as $freq) {
-            $new_input['frequencies'][$freq] = isset($input['frequencies'][$freq]) ? '1' : '0';
+            if (in_array($freq, array('E1', 'E2', 'E4', 'S'))) {
+                $new_input['frequencies'][$freq] = '1';
+            } else {
+                $new_input['frequencies'][$freq] = isset($input['frequencies'][$freq]) ? '1' : '0';
+            }
         }
-        // Ensure E1, E2, E4, and S are always enabled
-        $new_input['frequencies']['E1'] = '1';
-        $new_input['frequencies']['E2'] = '1';
-        $new_input['frequencies']['E4'] = '1';
-        $new_input['frequencies']['S'] = '1';
 
         return $new_input;
     }
@@ -440,11 +439,11 @@ class Zapier_Form_Admin {
         echo '<table class="form-table"><tr><th>Frequency</th><th>Value</th><th>Enabled</th></tr>';
         foreach ($frequencies as $key => $label) {
             $checked = isset($options['frequencies'][$key]) && $options['frequencies'][$key] == '1' ? 'checked' : '';
-            $disabled = in_array($key, array('E1', 'E2', 'E4', 'S')) ? 'disabled' : '';
+            $checked = in_array($key, array('E1', 'E2', 'E4', 'S')) ? 'checked' : $checked;
             echo "<tr>
                 <td>$label</td>
                 <td>$key</td>
-                <td><input type='checkbox' name='zapier_form_options[frequencies][$key]' value='1' $checked $disabled /></td>
+                <td><input type='checkbox' name='zapier_form_options[frequencies][$key]' value='1' $checked /></td>
               </tr>";
         }
         echo '</table>';
