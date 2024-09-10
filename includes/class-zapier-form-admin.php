@@ -235,6 +235,7 @@ class Zapier_Form_Admin {
         $new_input['submit_to_zapier'] = isset($input['submit_to_zapier']) ? '1' : '0';
         $new_input['submit_to_maidcentral'] = isset($input['submit_to_maidcentral']) ? '1' : '0';
         $new_input['show_half_bathrooms'] = isset($input['show_half_bathrooms']) ? '1' : '0';
+        $new_input['show_half_bathrooms'] = isset($input['show_half_bathrooms']) ? '1' : '0';
 
         // Sanitize frequencies
         $frequencies = array('E1', 'E2', 'E3', 'E4', 'S', 'OD', 'OR');
