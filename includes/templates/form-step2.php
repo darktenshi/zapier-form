@@ -47,6 +47,43 @@
             </select>
             <div class="error-message"></div>
         </div>
+        <div class="form-field">
+            <input type="number" id="HomeSquareFeet" name="HomeSquareFeet" required placeholder=" " min="1">
+            <label for="HomeSquareFeet">Square Footage</label>
+            <div class="error-message"></div>
+        </div>
+        <div class="form-field">
+            <select id="HomeBedrooms" name="HomeBedrooms" required aria-label="Number of Bedrooms">
+                <?php for ($i = 1; $i <= 10; $i++) : ?>
+                    <option value="<?php echo $i; ?>"><?php echo $i; ?> Bedroom<?php echo $i > 1 ? 's' : ''; ?></option>
+                <?php endfor; ?>
+            </select>
+            <div class="error-message"></div>
+        </div>
+        <div class="form-field">
+            <select id="HomeFullBathrooms" name="HomeFullBathrooms" required aria-label="Number of Full Bathrooms">
+                <?php for ($i = 1; $i <= 10; $i++) : ?>
+                    <option value="<?php echo $i; ?>"><?php echo $i; ?> Bathroom<?php echo $i > 1 ? 's' : ''; ?></option>
+                <?php endfor; ?>
+            </select>
+            <div class="error-message"></div>
+        </div>
+        <?php
+        $options = get_option('zapier_form_options');
+        $show_half_bathrooms = isset($options['show_half_bathrooms']) ? $options['show_half_bathrooms'] : '0';
+        if ($show_half_bathrooms === '1') :
+        ?>
+        <div class="form-field">
+            <select id="HomeHalfBathrooms" name="HomeHalfBathrooms" required aria-label="Number of Half Bathrooms">
+                <?php for ($i = 0; $i <= 10; $i++) : ?>
+                    <option value="<?php echo $i; ?>"><?php echo $i; ?> Half Bathroom<?php echo $i != 1 ? 's' : ''; ?></option>
+                <?php endfor; ?>
+            </select>
+            <div class="error-message"></div>
+        </div>
+        <?php else : ?>
+        <input type="hidden" id="HomeHalfBathrooms" name="HomeHalfBathrooms" value="0">
+        <?php endif; ?>
     </div>
     <div class="form-submit">
         <button type="submit" class="zapier-form-button">

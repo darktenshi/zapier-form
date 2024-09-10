@@ -244,6 +244,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         customErrorMessage = 'Please select a cleaning frequency';
                     }
                     break;
+                case 'HomeSquareFeet':
+                    if (parseInt(field.value) < 1) {
+                        customErrorMessage = 'Please enter a valid square footage';
+                    }
+                    break;
+                case 'HomeBedrooms':
+                case 'HomeFullBathrooms':
+                case 'HomeHalfBathrooms':
+                    if (field.value === '') {
+                        customErrorMessage = 'Please select a value';
+                    }
+                    break;
             }
         }
 

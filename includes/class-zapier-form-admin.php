@@ -130,6 +130,15 @@ class Zapier_Form_Admin {
         $this->add_settings_field('maidcentral_scope_group_id', 'Scope Group ID', 'text', 'maidcentral_settings');
         $this->add_settings_field('maidcentral_scope_of_work_id', 'Scope of Work ID', 'text', 'maidcentral_settings');
 
+        // Form Fields Settings
+        add_settings_section(
+            'form_fields_settings', 
+            'Form Fields Settings', 
+            array($this, 'print_section_info'), 
+            'zapier-form'
+        );
+        $this->add_settings_field('show_half_bathrooms', 'Show Half Bathrooms Field', 'checkbox', 'form_fields_settings');
+
         // Frequency Settings
         add_settings_field(
             'frequency_settings',
@@ -225,6 +234,7 @@ class Zapier_Form_Admin {
         $new_input['zapier_submit_button_show_arrow'] = isset($input['zapier_submit_button_show_arrow']) ? '1' : '0';
         $new_input['submit_to_zapier'] = isset($input['submit_to_zapier']) ? '1' : '0';
         $new_input['submit_to_maidcentral'] = isset($input['submit_to_maidcentral']) ? '1' : '0';
+        $new_input['show_half_bathrooms'] = isset($input['show_half_bathrooms']) ? '1' : '0';
 
         // Sanitize frequencies
         $frequencies = array('E1', 'E2', 'E3', 'E4', 'S', 'OD', 'OR');

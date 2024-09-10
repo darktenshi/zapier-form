@@ -137,7 +137,11 @@ class Zapier_Form_Multistep {
             'HomeCity' => sanitize_text_field($params['HomeCity']),
             'HomeRegion' => sanitize_text_field($params['HomeRegion']),
             'HomeZip' => $step1_data['Zip'], // Use the ZIP from step 1
-            'Frequency' => sanitize_text_field($params['Frequency'])
+            'Frequency' => sanitize_text_field($params['Frequency']),
+            'HomeSquareFeet' => intval($params['HomeSquareFeet']),
+            'HomeBedrooms' => intval($params['HomeBedrooms']),
+            'HomeFullBathrooms' => intval($params['HomeFullBathrooms']),
+            'HomeHalfBathrooms' => intval($params['HomeHalfBathrooms'])
         );
 
         $complete_data = array_merge($step1_data, $step2_data);
