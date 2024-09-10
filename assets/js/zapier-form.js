@@ -301,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentStep = 2;
                 leadId = data.lead_id;
                 loadStep2(leadId);
-                startSubmissionTimer();
+                // Remove the startSubmissionTimer() call as it's no longer needed
             } else {
                 showMessage(data.message || 'An error occurred. Please try again.', 'error');
             }
@@ -311,6 +311,8 @@ document.addEventListener('DOMContentLoaded', () => {
             showMessage('An error occurred. Please try again.', 'error');
         });
     }
+
+    // Remove the startSubmissionTimer function as it's no longer needed
 
     function loadStep2(leadId) {
         fetch(`${zapier_form_rest.root}zapier-form/v1/load-step2?lead_id=${leadId}`, {
