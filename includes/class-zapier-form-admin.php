@@ -419,8 +419,6 @@ class Zapier_Form_Admin {
         <?php
     }
 
-}
-
     public function frequency_settings_callback() {
         $options = get_option('zapier_form_options');
         $frequencies = array(
@@ -445,3 +443,4 @@ class Zapier_Form_Admin {
         }
         echo '</table>';
     }
+}
