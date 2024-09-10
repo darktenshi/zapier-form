@@ -81,9 +81,8 @@
             </select>
             <div class="error-message"></div>
         </div>
-        <?php else : ?>
-        <input type="hidden" id="HomeHalfBathrooms" name="HomeHalfBathrooms" value="0">
         <?php endif; ?>
+        <input type="hidden" id="HomeHalfBathrooms" name="HomeHalfBathrooms" value="0">
     </div>
     <div class="form-submit">
         <button type="submit" class="zapier-form-button">
