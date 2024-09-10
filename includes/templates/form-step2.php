@@ -25,6 +25,7 @@
             <div class="error-message"></div>
         </div>
         <div class="form-field">
+            <label for="Frequency">Cleaning Frequency</label>
             <select id="Frequency" name="Frequency" required>
                 <option value="">Select Frequency</option>
                 <?php
@@ -45,7 +46,6 @@
                 }
                 ?>
             </select>
-            <label for="Frequency">Cleaning Frequency</label>
             <div class="error-message"></div>
         </div>
     </div>
