@@ -25,8 +25,7 @@
             <div class="error-message"></div>
         </div>
         <div class="form-field">
-            <label for="Frequency">Cleaning Frequency</label>
-            <select id="Frequency" name="Frequency" required>
+            <select id="Frequency" name="Frequency" required aria-label="Cleaning Frequency">
                 <option value="">Select Frequency</option>
                 <?php
                 $options = get_option('zapier_form_options');
