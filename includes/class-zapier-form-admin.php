@@ -191,6 +191,14 @@ class Zapier_Form_Admin {
                 }
                 echo '</select>';
                 break;
+            case 'checkbox':
+                printf(
+                    '<input type="checkbox" id="%s" name="zapier_form_options[%s]" value="1" %s />',
+                    esc_attr($id),
+                    esc_attr($id),
+                    checked('1', $value, false)
+                );
+                break;
             case 'submission_options':
                 $this->submission_options_callback();
                 break;
