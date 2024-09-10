@@ -152,6 +152,10 @@ class Zapier_Form_Multistep {
         $submit_to_zapier = isset($options['submit_to_zapier']) ? $options['submit_to_zapier'] : '1';
         $submit_to_maidcentral = isset($options['submit_to_maidcentral']) ? $options['submit_to_maidcentral'] : '0';
 
+        // Add ScopeOfWorkId and ScopeGroupId to the data
+        $data['ScopeOfWorkId'] = isset($options['maidcentral_scope_of_work_id']) ? $options['maidcentral_scope_of_work_id'] : '';
+        $data['ScopeGroupId'] = isset($options['maidcentral_scope_group_id']) ? $options['maidcentral_scope_group_id'] : '';
+
         $success_messages = array();
         $error_messages = array();
 
