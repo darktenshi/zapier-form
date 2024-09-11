@@ -66,13 +66,8 @@
             <div class="error-message"></div>
         </div>
         <div class="form-field">
-            <input type="number" id="ZillowSquareFootage" name="ZillowSquareFootage" value="<?php echo esc_attr($step1_data['ZillowSquareFootage'] ?? ''); ?>" readonly placeholder=" ">
-            <label for="ZillowSquareFootage">Zillow Square Footage</label>
-            <div class="error-message"></div>
-        </div>
-        <div class="form-field">
             <input type="number" id="ManualSquareFootage" name="ManualSquareFootage" placeholder=" " min="1">
-            <label for="ManualSquareFootage">Manual Square Footage (if different)</label>
+            <label for="ManualSquareFootage">Square Footage (optional)</label>
             <div class="error-message"></div>
         </div>
         <div class="form-field">

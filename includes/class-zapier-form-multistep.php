@@ -97,11 +97,6 @@ class Zapier_Form_Multistep {
             'timestamp' => time()
         );
 
-        $zillow_data = $this->get_zillow_data($params['Zip']);
-        if ($zillow_data && isset($zillow_data['results'][0]['livingArea'])) {
-            $step1_data['ZillowSquareFootage'] = $zillow_data['results'][0]['livingArea'];
-        }
-
         $lead_id = uniqid();
         update_option($this->lead_prefix . $lead_id, $step1_data);
 
@@ -111,7 +106,7 @@ class Zapier_Form_Multistep {
         return new WP_REST_Response(array('success' => true, 'lead_id' => $lead_id));
     }
 
-    private function get_zillow_data($zip) {
+    private function get_zillow_data($address) {
         $options = get_option('zapier_form_options');
         $api_key = $options['zillow_api_key'];
         
@@ -120,7 +115,7 @@ class Zapier_Form_Multistep {
             return null;
         }
 
-        $url = "https://zillow56.p.rapidapi.com/search?location=" . urlencode($zip);
+        $url = "https://zillow56.p.rapidapi.com/search?location=" . urlencode($address);
 
         $args = array(
             'headers' => array(
@@ -184,11 +179,19 @@ class Zapier_Form_Multistep {
             'HomeHalfBathrooms' => intval($params['HomeHalfBathrooms'])
         );
 
+        // Fetch Zillow data using the full address
+        $full_address = $step2_data['HomeAddress1'] . ', ' . $step2_data['HomeCity'] . ', ' . $step2_data['HomeRegion'] . ' ' . $step2_data['HomeZip'];
+        $zillow_data = $this->get_zillow_data($full_address);
+        
+        if ($zillow_data && isset($zillow_data['results'][0]['livingArea'])) {
+            $step2_data['ZillowSquareFootage'] = $zillow_data['results'][0]['livingArea'];
+        }
+
         // Prioritize manual entry if provided
         if (!empty($params['ManualSquareFootage'])) {
             $step2_data['HomeSquareFeet'] = intval($params['ManualSquareFootage']);
-        } elseif (isset($step1_data['ZillowSquareFootage'])) {
-            $step2_data['HomeSquareFeet'] = intval($step1_data['ZillowSquareFootage']);
+        } elseif (isset($step2_data['ZillowSquareFootage'])) {
+            $step2_data['HomeSquareFeet'] = intval($step2_data['ZillowSquareFootage']);
         } else {
             $step2_data['HomeSquareFeet'] = 0; // Default value if no square footage is provided
         }
