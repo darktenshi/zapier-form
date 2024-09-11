@@ -129,6 +129,7 @@ class Zapier_Form_Admin {
         // MaidCentral Settings
         $this->add_settings_field('maidcentral_scope_group_id', 'Scope Group ID', 'text', 'maidcentral_settings');
         $this->add_settings_field('maidcentral_scope_of_work_id', 'Scope of Work ID', 'text', 'maidcentral_settings');
+        $this->add_settings_field('maidcentral_customer_source_id', 'Customer Source ID', 'text', 'maidcentral_settings');
 
         // Form Fields Settings
         add_settings_section(

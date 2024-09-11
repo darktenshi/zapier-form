@@ -250,6 +250,9 @@ class Zapier_Form_Multistep {
         }
 
         $maidcentral_data = array(
+            'ScopeGroupId' => $options['maidcentral_scope_group_id'],
+            'ScopeOfWorkId' => $options['maidcentral_scope_of_work_id'],
+            'CustomerSourceID' => $options['maidcentral_customer_source_id'],
             'FirstName' => $data['FirstName'],
             'LastName' => $data['LastName'],
             'Email' => $data['Email'],
@@ -259,9 +262,11 @@ class Zapier_Form_Multistep {
             'HomeCity' => isset($data['HomeCity']) ? $data['HomeCity'] : '',
             'HomeRegion' => isset($data['HomeRegion']) ? $data['HomeRegion'] : '',
             'HomeZip' => isset($data['HomeZip']) ? $data['HomeZip'] : $data['Zip'],
-            'ScopeGroupId' => $options['maidcentral_scope_group_id'],
-            'ScopeOfWorkId' => $options['maidcentral_scope_of_work_id'],
-            'Frequency' => isset($data['Frequency']) ? $data['Frequency'] : ''
+            'Frequency' => isset($data['Frequency']) ? $data['Frequency'] : '',
+            'HomeSquareFeet' => isset($data['HomeSquareFeet']) ? $data['HomeSquareFeet'] : '',
+            'HomeBedrooms' => isset($data['HomeBedrooms']) ? $data['HomeBedrooms'] : '',
+            'HomeFullBathrooms' => isset($data['HomeFullBathrooms']) ? $data['HomeFullBathrooms'] : '',
+            'HomeHalfBathrooms' => isset($data['HomeHalfBathrooms']) ? $data['HomeHalfBathrooms'] : ''
         );
 
         $response = wp_remote_post($maidcentral_api_link, array(

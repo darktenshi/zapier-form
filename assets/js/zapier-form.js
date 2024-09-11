@@ -362,6 +362,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = new FormData(form);
         formData.append('lead_id', leadId);
 
+        // Add the new fields
+        formData.append('HomeSquareFeet', document.getElementById('HomeSquareFeet').value);
+        formData.append('HomeBedrooms', document.getElementById('HomeBedrooms').value);
+        formData.append('HomeFullBathrooms', document.getElementById('HomeFullBathrooms').value);
+        formData.append('HomeHalfBathrooms', document.getElementById('HomeHalfBathrooms').value);
+
         fetch(`${zapier_form_rest.root}zapier-form/v1/submit-step2`, {
             method: 'POST',
             headers: {
