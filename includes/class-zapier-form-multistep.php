@@ -47,13 +47,13 @@ class Zapier_Form_Multistep {
         include(ZFI_PLUGIN_DIR . 'includes/templates/form-step1.php');
         $html = ob_get_clean();
         $response = array('success' => true, 'html' => $html);
-        $json_response = json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $json_response = wp_json_encode($response);
         if ($json_response === false) {
             $this->log_debug('JSON encoding failed: ' . json_last_error_msg());
             return new WP_REST_Response(array('success' => false, 'message' => 'Internal server error'), 500);
         }
         $this->log_debug('load_step1 response: ' . $json_response);
-        return new WP_REST_Response($response);
+        return new WP_REST_Response(json_decode($json_response), 200);
     }
 
     public function handle_client_log($request) {
@@ -97,7 +97,7 @@ class Zapier_Form_Multistep {
             'timestamp' => time()
         );
 
-        $zillow_data = $this->get_zillow_data($params['HomeAddress1'] . ', ' . $params['Zip']);
+        $zillow_data = $this->get_zillow_data($params['Zip']);
         if ($zillow_data && isset($zillow_data['results'][0]['livingArea'])) {
             $step1_data['ZillowSquareFootage'] = $zillow_data['results'][0]['livingArea'];
         }
@@ -109,6 +109,42 @@ class Zapier_Form_Multistep {
         wp_schedule_single_event(time() + 300, 'zapier_form_submit_incomplete_lead', array($lead_id));
 
         return new WP_REST_Response(array('success' => true, 'lead_id' => $lead_id));
+    }
+
+    private function get_zillow_data($zip) {
+        $options = get_option('zapier_form_options');
+        $api_key = $options['zillow_api_key'];
+        
+        if (!$api_key) {
+            $this->log_debug('Zillow API key not set');
+            return null;
+        }
+
+        $url = "https://zillow56.p.rapidapi.com/search?location=" . urlencode($zip);
+
+        $args = array(
+            'headers' => array(
+                'X-RapidAPI-Host' => 'zillow56.p.rapidapi.com',
+                'X-RapidAPI-Key' => $api_key
+            )
+        );
+
+        $response = wp_remote_get($url, $args);
+
+        if (is_wp_error($response)) {
+            $this->log_debug('Zillow API request failed: ' . $response->get_error_message());
+            return null;
+        }
+
+        $body = wp_remote_retrieve_body($response);
+        $data = json_decode($body, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $this->log_debug('Failed to parse Zillow API response: ' . json_last_error_msg());
+            return null;
+        }
+
+        return $data;
     }
 
     public function submit_incomplete_lead($lead_id) {
