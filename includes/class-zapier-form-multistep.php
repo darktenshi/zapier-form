@@ -97,6 +97,11 @@ class Zapier_Form_Multistep {
             'timestamp' => time()
         );
 
+        $zillow_data = $this->get_zillow_data($params['HomeAddress1'] . ', ' . $params['Zip']);
+        if ($zillow_data && isset($zillow_data['results'][0]['livingArea'])) {
+            $step1_data['ZillowSquareFootage'] = $zillow_data['results'][0]['livingArea'];
+        }
+
         $lead_id = uniqid();
         update_option($this->lead_prefix . $lead_id, $step1_data);
 
@@ -138,11 +143,19 @@ class Zapier_Form_Multistep {
             'HomeRegion' => sanitize_text_field($params['HomeRegion']),
             'HomeZip' => $step1_data['Zip'], // Use the ZIP from step 1
             'Frequency' => sanitize_text_field($params['Frequency']),
-            'HomeSquareFeet' => intval($params['HomeSquareFeet']),
             'HomeBedrooms' => intval($params['HomeBedrooms']),
             'HomeFullBathrooms' => intval($params['HomeFullBathrooms']),
             'HomeHalfBathrooms' => intval($params['HomeHalfBathrooms'])
         );
+
+        // Prioritize manual entry if provided
+        if (!empty($params['ManualSquareFootage'])) {
+            $step2_data['HomeSquareFeet'] = intval($params['ManualSquareFootage']);
+        } elseif (isset($step1_data['ZillowSquareFootage'])) {
+            $step2_data['HomeSquareFeet'] = intval($step1_data['ZillowSquareFootage']);
+        } else {
+            $step2_data['HomeSquareFeet'] = 0; // Default value if no square footage is provided
+        }
 
         $complete_data = array_merge($step1_data, $step2_data);
 
