@@ -230,7 +230,8 @@ class Zapier_Form_Admin {
             'zapier_open_button_text' => 'sanitize_text_field',
             'zapier_submit_button_text' => 'sanitize_text_field',
             'maidcentral_scope_group_id' => 'sanitize_text_field',
-            'maidcentral_scope_of_work_id' => 'sanitize_text_field'
+            'maidcentral_scope_of_work_id' => 'sanitize_text_field',
+            'maidcentral_customer_source_id' => 'sanitize_text_field'
         );
 
         foreach ($fields as $field => $sanitize_function) {
