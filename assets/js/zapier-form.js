@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         customErrorMessage = 'Please select a cleaning frequency';
                     }
                     break;
-                case 'HomeSquareFeet':
+                case 'ManualSquareFootage':
                     if (parseInt(field.value) < 1) {
                         customErrorMessage = 'Please enter a valid square footage';
                     }
@@ -274,6 +274,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return isValid;
     }
+
+    // Add event listener for manual square footage override
+    document.addEventListener('DOMContentLoaded', function() {
+        const manualSquareFootage = document.getElementById('ManualSquareFootage');
+        const zillowSquareFootage = document.getElementById('ZillowSquareFootage');
+        
+        if (manualSquareFootage && zillowSquareFootage) {
+            manualSquareFootage.addEventListener('input', function() {
+                if (this.value) {
+                    zillowSquareFootage.value = '';
+                }
+            });
+        }
+    });
 
     function shakeInvalidFields() {
         const form = document.getElementById(`zapier-form-step${currentStep}`);
