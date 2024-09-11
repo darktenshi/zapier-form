@@ -105,6 +105,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    function handleFormSubmit(e) {
+        e.preventDefault();
+        formSubmitted = true;
+
+        if (validateForm()) {
+            if (currentStep === 1) {
+                submitStep1();
+            } else {
+                submitStep2();
+            }
+        } else {
+            shakeInvalidFields();
+            focusFirstInvalidField();
+        }
+    }
+
     function loadStep1() {
         fetch(`${zapier_form_rest.root}zapier-form/v1/load-step1`, {
             method: 'GET',
@@ -137,27 +153,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const form = document.getElementById(`zapier-form-step${currentStep}`);
         if (!form) return;
 
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            formSubmitted = true;
-
-            if (validateForm()) {
-                if (currentStep === 1) {
-                    submitStep1();
-                } else {
-                    submitStep2();
-                }
-            } else {
-                shakeInvalidFields();
-                focusFirstInvalidField();
-            }
-        });
+        form.addEventListener('submit', handleFormSubmit);
 
         form.addEventListener('input', (event) => {
             if (formSubmitted) {
                 validateField(event.target);
             }
         });
+
+        // Add event listener for the next step button
+        const nextStepButton = form.querySelector('button[type="submit"]');
+        if (nextStepButton) {
+            nextStepButton.addEventListener('click', handleFormSubmit);
+        }
 
         // Add event listeners for field-specific formatting
         const phoneInput = form.querySelector('input[name="Phone"]');
