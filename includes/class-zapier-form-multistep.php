@@ -259,14 +259,27 @@ class Zapier_Form_Multistep {
             'Phone' => $data['Phone'],
             'PostalCode' => $data['Zip'],
             'HomeAddress1' => isset($data['HomeAddress1']) ? $data['HomeAddress1'] : '',
+            'HomeAddress2' => '', // We don't collect this, but include it as an empty string
             'HomeCity' => isset($data['HomeCity']) ? $data['HomeCity'] : '',
             'HomeRegion' => isset($data['HomeRegion']) ? $data['HomeRegion'] : '',
+            'HomeCountry' => 'US', // Assuming US, adjust if needed
             'HomeZip' => isset($data['HomeZip']) ? $data['HomeZip'] : $data['Zip'],
             'Frequency' => isset($data['Frequency']) ? $data['Frequency'] : '',
-            'HomeSquareFeet' => isset($data['HomeSquareFeet']) ? $data['HomeSquareFeet'] : '',
-            'HomeBedrooms' => isset($data['HomeBedrooms']) ? $data['HomeBedrooms'] : '',
-            'HomeFullBathrooms' => isset($data['HomeFullBathrooms']) ? $data['HomeFullBathrooms'] : '',
-            'HomeHalfBathrooms' => isset($data['HomeHalfBathrooms']) ? $data['HomeHalfBathrooms'] : ''
+            'HomeSquareFeet' => isset($data['HomeSquareFeet']) ? intval($data['HomeSquareFeet']) : 0,
+            'HomeBedrooms' => isset($data['HomeBedrooms']) ? intval($data['HomeBedrooms']) : 0,
+            'HomeFullBathrooms' => isset($data['HomeFullBathrooms']) ? intval($data['HomeFullBathrooms']) : 0,
+            'HomeHalfBathrooms' => isset($data['HomeHalfBathrooms']) ? intval($data['HomeHalfBathrooms']) : 0,
+            'HomeOtherRooms' => 0, // We don't collect this, but include it as 0
+            'HomeStories' => 0, // We don't collect this, but include it as 0
+            'HomePets' => 0, // We don't collect this, but include it as 0
+            'HomeResidents' => 0, // We don't collect this, but include it as 0
+            'HomeCleaningType' => '', // We don't collect this, but include it as an empty string
+            'HomeLastCleaned' => '', // We don't collect this, but include it as an empty string
+            'HomeCleaningNotes' => '', // We don't collect this, but include it as an empty string
+            'ScheduleDate' => '', // We don't collect this, but include it as an empty string
+            'ScheduleTime' => '', // We don't collect this, but include it as an empty string
+            'ScheduleFlexible' => false, // We don't collect this, but include it as false
+            'ScheduleNotes' => '', // We don't collect this, but include it as an empty string
         );
 
         $response = wp_remote_post($maidcentral_api_link, array(
@@ -280,7 +293,8 @@ class Zapier_Form_Multistep {
 
         $response_code = wp_remote_retrieve_response_code($response);
         if ($response_code !== 200) {
-            return "Unexpected response code: " . $response_code;
+            $body = wp_remote_retrieve_body($response);
+            return "Unexpected response code: " . $response_code . ". Body: " . $body;
         }
 
         return true;
